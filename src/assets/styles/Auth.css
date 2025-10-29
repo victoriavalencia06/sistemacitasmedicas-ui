@@ -1,0 +1,157 @@
+:root {
+    --primary-blue: #1a73e8;
+    --light-blue: #e8f0fe;
+    --dark-blue: #0d47a1;
+    --white: #ffffff;
+    --text-gray: #5f6368;
+    --bg-page: #f3f6fa;
+}
+
+/* === CONTENEDOR PRINCIPAL === */
+.auth-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 16px;
+    background: var(--bg-page);
+}
+
+.auth-container {
+    width: 100%;
+    max-width: 460px;
+    padding: 16px;
+}
+
+/* === TARJETA === */
+.auth-card {
+    background-color: var(--white);
+    border-radius: 14px;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+    padding: 30px 26px;
+}
+
+/* === LOGO / TÍTULO === */
+.logo-container {
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.medical-icon {
+    background-color: var(--light-blue);
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 10px;
+    color: var(--primary-blue);
+    font-size: 32px;
+}
+
+.auth-title {
+    color: var(--dark-blue);
+    font-weight: 600;
+    font-size: 22px;
+}
+
+.auth-subtitle {
+    color: var(--text-gray);
+    font-size: 14px;
+    margin-bottom: 16px;
+}
+
+/* === CAMPOS === */
+.form-control {
+    width: 100%;
+    border-radius: 8px;
+    padding: 10px 12px;
+    border: 1px solid #e0e0e0;
+    font-size: 14px;
+    transition: all 0.18s;
+    box-sizing: border-box;
+}
+
+.small-input {
+    max-width: 90%;
+    margin: 0 auto;
+    display: block;
+}
+
+.form-control:focus {
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 0.12rem rgba(26, 115, 232, 0.12);
+}
+
+/* === BOTÓN === */
+.btn-login {
+    background-color: var(--primary-blue);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+    font-weight: 500;
+    width: 90%;
+    margin: 0 auto;
+    display: block;
+}
+
+.btn-login:hover {
+    background-color: var(--dark-blue);
+    cursor: pointer;
+}
+
+/* === LINKS === */
+.links-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 16px;
+    gap: 8px;
+}
+
+.column-links {
+    flex-direction: column;
+    align-items: center;
+}
+
+.links-container a {
+    color: var(--primary-blue);
+    text-decoration: none;
+    font-size: 15px;
+}
+
+.links-container a:hover {
+    color: var(--dark-blue);
+    text-decoration: underline;
+}
+
+.register-text {
+    font-size: 15px;
+    color: var(--text-gray);
+    margin: 0;
+}
+
+.register-text .register-link {
+    font-weight: 500;
+    color: var(--primary-blue);
+}
+
+.register-text .register-link:hover {
+    color: var(--dark-blue);
+}
+
+/* === RESPONSIVE === */
+@media (max-width:576px) {
+    .auth-container {
+        max-width: 400px;
+    }
+
+    .auth-card {
+        padding: 24px 18px;
+    }
+
+    .small-input {
+        max-width: 100%;
+    }
+}

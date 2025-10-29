@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 export default function Header() {
   return (
     <header className="glass">
@@ -9,12 +11,12 @@ export default function Header() {
 
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-            <li className="nav-item"><a className="nav-link" href="#home">Inicio</a></li>
+            <li className="nav-item"><Link className="nav-link" to="/">Inicio</Link></li>
             <li className="nav-item"><a className="nav-link" href="#services">Servicios</a></li>
             <li className="nav-item"><a className="nav-link" href="#about">Sobre Nosotros</a></li>
             <li className="nav-item"><a className="nav-link" href="#contact">Contacto</a></li>
           </ul>
-          <a href="#login" className="btn-import ms-2">Iniciar Sesión</a>
+          <Link to="/login" className="btn-import ms-2">Iniciar Sesión</Link>
         </div>
       </nav>
     </header>
