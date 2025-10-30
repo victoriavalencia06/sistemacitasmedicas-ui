@@ -1,14 +1,21 @@
 import { useForm } from "react-hook-form";
-import { FaStethoscope } from "react-icons/fa";
+import { FaStethoscope, FaEye, FaEyeSlash } from "react-icons/fa";
+import { useState } from "react";
 import "../../assets/styles/Auth.css"
+import { Link } from "react-router-dom";
 
 export default function Login() {
     const {
         register,
         handleSubmit,
-        getValues,
+        watch,
         formState: { errors },
     } = useForm();
+
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+    const password = watch("password", "");
 
     const onSubmit = (data) => {
         console.log("Datos enviados:", data);
@@ -47,40 +54,60 @@ export default function Login() {
                             )}
                         </div>
 
-                        <div className="mb-3">
+                        {/* Contraseña */}
+                        <div className="mb-3 position-relative">
                             <label className="form-label">Contraseña</label>
-                            <input
-                                type="password"
-                                className="form-control"
-                                placeholder="Ingresa tu contraseña"
-                                {...register("password", {
-                                    required: "La contraseña es obligatoria",
-                                    minLength: {
-                                        value: 6,
-                                        message: "Debe tener al menos 6 caracteres",
-                                    },
-                                })}
-                            />
+                            <div className="password-wrapper">
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    className="form-control"
+                                    placeholder="Crea una contraseña"
+                                    {...register("password", {
+                                        required: "La contraseña es obligatoria",
+                                        minLength: {
+                                            value: 6,
+                                            message: "Debe tener al menos 6 caracteres",
+                                        },
+                                    })}
+                                />
+                                <button
+                                    type="button"
+                                    className="toggle-password"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                >
+                                    {showPassword ? <FaEye /> : <FaEyeSlash />}
+                                </button>
+                            </div>
                             {errors.password && (
-                                <p className="text-danger small mt-1">
-                                    {errors.password.message}
-                                </p>
+                                <p className="text-danger small mt-1">{errors.password.message}</p>
                             )}
                         </div>
 
-                        {/* Campo nuevo: confirmar contraseña */}
-                        <div className="mb-3">
+                        {/* Confirmar contraseña */}
+                        <div className="mb-3 position-relative">
                             <label className="form-label">Confirmar contraseña</label>
-                            <input
-                                type="password"
-                                className="form-control"
-                                placeholder="Confirma tu contraseña"
-                                {...register("confirmPassword", {
-                                    required: "Confirma la contraseña",
-                                    validate: (value) =>
-                                        value === getValues("password") || "Las contraseñas no coinciden",
-                                })}
-                            />
+                            <div className="password-wrapper">
+                                <input
+                                    type={showConfirmPassword ? "text" : "password"}
+                                    className="form-control"
+                                    placeholder="Confirma tu contraseña"
+                                    {...register("confirmPassword", {
+                                        required: "Debes confirmar la contraseña",
+                                        validate: (value) =>
+                                            value === password ||
+                                            "Las contraseñas no coinciden",
+                                    })}
+                                />
+                                <button
+                                    type="button"
+                                    className="toggle-password"
+                                    onClick={() =>
+                                        setShowConfirmPassword(!showConfirmPassword)
+                                    }
+                                >
+                                    {showPassword ? <FaEye /> : <FaEyeSlash />}
+                                </button>
+                            </div>
                             {errors.confirmPassword && (
                                 <p className="text-danger small mt-1">
                                     {errors.confirmPassword.message}
@@ -99,9 +126,9 @@ export default function Login() {
 
                             <p className="register-text">
                                 ¿No tienes cuenta?{" "}
-                                <a href="/register" className="register-link">
+                                <Link to="/register" className="register-link">
                                     Regístrate aquí
-                                </a>
+                                </Link>
                             </p>
                         </div>
                     </form>

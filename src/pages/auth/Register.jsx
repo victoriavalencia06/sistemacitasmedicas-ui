@@ -1,6 +1,8 @@
 import { useForm } from "react-hook-form";
-import { FaUserPlus } from "react-icons/fa";
+import { FaUserPlus, FaEye, FaEyeSlash } from "react-icons/fa";
+import { useState } from "react";
 import "../../assets/styles/Auth.css";
+import { Link } from "react-router-dom";
 
 export default function Register() {
     const {
@@ -10,13 +12,14 @@ export default function Register() {
         formState: { errors },
     } = useForm();
 
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+    const password = watch("password", "");
+
     const onSubmit = (data) => {
         console.log("Datos registrados:", data);
-        // Aquí luego se conectará la API de registro
     };
-
-    // Validar que las contraseñas coincidan
-    const password = watch("password", "");
 
     return (
         <div className="auth-page">
@@ -49,9 +52,7 @@ export default function Register() {
                                 })}
                             />
                             {errors.nombre && (
-                                <p className="text-danger small mt-1">
-                                    {errors.nombre.message}
-                                </p>
+                                <p className="text-danger small mt-1">{errors.nombre.message}</p>
                             )}
                         </div>
 
@@ -76,40 +77,59 @@ export default function Register() {
                         </div>
 
                         {/* Contraseña */}
-                        <div className="mb-3">
+                        <div className="mb-3 position-relative">
                             <label className="form-label">Contraseña</label>
-                            <input
-                                type="password"
-                                className="form-control"
-                                placeholder="Crea una contraseña"
-                                {...register("password", {
-                                    required: "La contraseña es obligatoria",
-                                    minLength: {
-                                        value: 6,
-                                        message: "Debe tener al menos 6 caracteres",
-                                    },
-                                })}
-                            />
+                            <div className="password-wrapper">
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    className="form-control"
+                                    placeholder="Crea una contraseña"
+                                    {...register("password", {
+                                        required: "La contraseña es obligatoria",
+                                        minLength: {
+                                            value: 6,
+                                            message: "Debe tener al menos 6 caracteres",
+                                        },
+                                    })}
+                                />
+                                <button
+                                    type="button"
+                                    className="toggle-password"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                >
+                                    {showPassword ? <FaEye /> : <FaEyeSlash />}
+                                </button>
+                            </div>
                             {errors.password && (
-                                <p className="text-danger small mt-1">
-                                    {errors.password.message}
-                                </p>
+                                <p className="text-danger small mt-1">{errors.password.message}</p>
                             )}
                         </div>
 
                         {/* Confirmar contraseña */}
-                        <div className="mb-3">
+                        <div className="mb-3 position-relative">
                             <label className="form-label">Confirmar contraseña</label>
-                            <input
-                                type="password"
-                                className="form-control"
-                                placeholder="Confirma tu contraseña"
-                                {...register("confirmPassword", {
-                                    required: "Debes confirmar la contraseña",
-                                    validate: (value) =>
-                                        value === password || "Las contraseñas no coinciden",
-                                })}
-                            />
+                            <div className="password-wrapper">
+                                <input
+                                    type={showConfirmPassword ? "text" : "password"}
+                                    className="form-control"
+                                    placeholder="Repite tu contraseña"
+                                    {...register("confirmPassword", {
+                                        required: "Debes confirmar la contraseña",
+                                        validate: (value) =>
+                                            value === password ||
+                                            "Las contraseñas no coinciden",
+                                    })}
+                                />
+                                <button
+                                    type="button"
+                                    className="toggle-password"
+                                    onClick={() =>
+                                        setShowConfirmPassword(!showConfirmPassword)
+                                    }
+                                >
+                                    {showPassword ? <FaEye /> : <FaEyeSlash />}
+                                </button>
+                            </div>
                             {errors.confirmPassword && (
                                 <p className="text-danger small mt-1">
                                     {errors.confirmPassword.message}
@@ -124,9 +144,9 @@ export default function Register() {
                         <div className="links-container column-links">
                             <p className="register-text">
                                 ¿Ya tienes cuenta?{" "}
-                                <a href="/login" className="register-link">
+                                <Link to="/login" className="register-link">
                                     Inicia sesión
-                                </a>
+                                </Link>
                             </p>
                         </div>
                     </form>

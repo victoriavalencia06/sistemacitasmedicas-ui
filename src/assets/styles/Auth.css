@@ -141,6 +141,32 @@
     color: var(--dark-blue);
 }
 
+/* Íconos de mostrar/ocultar contraseña */
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #7b8a9a;
+    font-size: 1.1rem;
+    padding: 0;
+    display: flex;
+    align-items: center;
+}
+
+.toggle-password:hover {
+    color: var(--primary-blue);
+}
+
 /* === RESPONSIVE === */
 @media (max-width:576px) {
     .auth-container {
