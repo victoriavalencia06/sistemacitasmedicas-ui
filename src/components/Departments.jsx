@@ -1,4 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import {
+  FaStethoscope,
+  FaHeartbeat,
+  FaChild,
+  FaCut,
+  FaFemale,
+  FaUserMd,
+  FaXRay,
+  FaAmbulance
+} from "react-icons/fa";
 
 const Departments = () => {
   const [activeDepartment, setActiveDepartment] = useState(null);
@@ -7,26 +17,28 @@ const Departments = () => {
     {
       id: 0,
       title: "Medicina General",
-      description: "Atención primaria de la salud para todas las edades, diagnóstico y tratamiento de enfermedades comunes.",
+      description:
+        "Atención primaria de la salud para todas las edades, diagnóstico y tratamiento de enfermedades comunes.",
       services: [
         "Consulta médica general",
         "Chequeos preventivos",
         "Tratamiento de enfermedades comunes",
         "Referencia a especialistas"
       ],
-      image: "/images/medicinaGeneral.png"
+      icon: <FaStethoscope size={48} color="#0d6efd" />
     },
     {
       id: 1,
       title: "Salud Preventiva",
-      description: "Enfoque en la prevención de enfermedades y promoción de hábitos saludables.",
+      description:
+        "Enfoque en la prevención de enfermedades y promoción de hábitos saludables.",
       services: [
         "Chequeos médicos periódicos",
         "Vacunación",
         "Control de presión arterial",
         "Orientación nutricional"
       ],
-      image: "/images/saludPreventiva.png"
+      icon: <FaHeartbeat size={48} color="#0d6efd" />
     },
     {
       id: 2,
@@ -38,70 +50,74 @@ const Departments = () => {
         "Atención de enfermedades infantiles",
         "Orientación a padres"
       ],
-      image: "/images/pedriatria.png"
+      icon: <FaChild size={48} color="#0d6efd" />
     },
     {
       id: 3,
       title: "Cirugía Menor",
-      description: "Procedimientos quirúrgicos ambulatorios de baja complejidad.",
+      description:
+        "Procedimientos quirúrgicos ambulatorios de baja complejidad.",
       services: [
         "Extracción de lunares",
         "Suturas de heridas menores",
         "Extracción de uñas",
         "Drenaje de abscesos"
       ],
-      image: "/images/cirugiaMenor.png"
+      icon: <FaCut size={48} color="#0d6efd" />
     },
     {
       id: 4,
       title: "Ginecología y Obstetricia",
-      description: "Cuidado de la salud reproductiva femenina y atención durante el embarazo.",
+      description:
+        "Cuidado de la salud reproductiva femenina y atención durante el embarazo.",
       services: [
         "Control prenatal",
         "Ultrasonidos obstétricos",
         "Planificación familiar",
         "Atención de parto"
       ],
-      image: "/images/ginecologia.png"
+      icon: <FaFemale size={48} color="#0d6efd" />
     },
     {
       id: 5,
       title: "Dermatología",
-      description: "Diagnóstico y tratamiento de enfermedades de la piel, cabello y uñas.",
+      description:
+        "Diagnóstico y tratamiento de enfermedades de la piel, cabello y uñas.",
       services: [
         "Tratamiento de acné",
         "Revisión de lunares",
         "Tratamiento de dermatitis",
         "Cirugía menor de piel"
       ],
-      image: "/images/dermatologia.png"
+      icon: <FaUserMd size={48} color="#0d6efd" />
     },
     {
       id: 6,
       title: "Exámenes e Imágenes",
-      description: "Estudios de diagnóstico por imágenes y pruebas de laboratorio.",
+      description:
+        "Estudios de diagnóstico por imágenes y pruebas de laboratorio.",
       services: [
         "Ultrasonidos",
         "Rayos X",
         "Exámenes de laboratorio",
         "Electrocardiograma (ECG)"
       ],
-      image: "/images/examenes.png"
+      icon: <FaXRay size={48} color="#0d6efd" />
     },
     {
       id: 7,
       title: "Atención de Emergencias",
-      description: "Atención médica inmediata para situaciones urgentes.",
+      description:
+        "Atención médica inmediata para situaciones urgentes.",
       services: [
         "Atención de urgencias",
         "Estabilización de pacientes",
         "Curaciones rápidas",
         "Referencia a hospitalización"
       ],
-      image: "/images/emergencias.png"
+      icon: <FaAmbulance size={48} color="#0d6efd" />
     }
   ];
-
 
   return (
     <section className="departments-section">
@@ -115,21 +131,19 @@ const Departments = () => {
         </div>
 
         <div className="department-selector">
-          {/* Miniaturas en fila horizontal con scroll */}
           <div className="department-thumbnails">
             {departments.map((dept) => (
               <div
                 key={dept.id}
-                className={`department-thumbnail ${activeDepartment === dept.id ? 'active' : ''}`}
+                className={`department-thumbnail ${activeDepartment === dept.id ? "active" : ""}`}
                 onClick={() => setActiveDepartment(dept.id)}
               >
-                <img src={dept.image} alt={dept.title} />
+                <div className="icon-wrapper">{dept.icon}</div>
                 <div className="thumbnail-title">{dept.title}</div>
               </div>
             ))}
           </div>
 
-          {/* Contenido dinámico debajo */}
           {activeDepartment !== null && (
             <div className="department-content">
               <button

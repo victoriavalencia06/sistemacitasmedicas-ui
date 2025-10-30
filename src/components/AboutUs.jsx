@@ -12,7 +12,7 @@ const AboutUs = () => {
                 <div className="about-content-simple">
                     <div className="about-image">
                         <img
-                            src="https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
+                            src="https://raw.githubusercontent.com/victoriavalencia06/project-images/refs/heads/main/clinic/doc.png"
                             alt="Médicos de Mediclinic"
                         />
                     </div>

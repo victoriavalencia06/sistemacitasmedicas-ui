@@ -23,7 +23,7 @@ export default function Home() {
                         </div>
                         <div className="col-lg-6 text-center mt-4 mt-lg-0">
                             <img
-                                src="https://source.unsplash.com/600x400/?doctor,medical"
+                                src="https://raw.githubusercontent.com/victoriavalencia06/project-images/refs/heads/main/clinic/medic1.png"
                                 alt="Doctor con calendario"
                             />
                         </div>
