@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://Citas.somee.com/api",
+  baseURL: "https://Citas.somee.com/api",
   headers: {
     "Content-Type": "application/json",
   },

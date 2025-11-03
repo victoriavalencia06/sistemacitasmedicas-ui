@@ -4,6 +4,7 @@ import { useState, useContext } from "react";
 import "../../assets/styles/Auth.css";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
+import Dashboard from "../Dashboard";
 
 export default function Login() {
   const {
@@ -31,7 +32,7 @@ export default function Login() {
       };
 
       await login(body);
-      navigate("/"); // redirigir al Home
+      navigate("/dashboard"); // redirigir al Home
     } catch (err) {
       console.error(err);
       alert("Error al iniciar sesión. Verifica tus credenciales.");
