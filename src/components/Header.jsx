@@ -1,11 +1,25 @@
 import { Link } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 
 export default function Header() {
+  const { user, logout } = useContext(AuthContext);
+
+  const nombre =
+    user?.[
+      "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
+    ] || user?.name || user?.sub;
+
   return (
     <header className="glass">
       <nav className="navbar navbar-expand-lg container">
         <a className="navbar-brand" href="#">MediCitas</a>
-        <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <button
+          className="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
           <span className="navbar-toggler-icon"></span>
         </button>
 
@@ -16,7 +30,17 @@ export default function Header() {
             <li className="nav-item"><a className="nav-link" href="#about">Sobre Nosotros</a></li>
             <li className="nav-item"><a className="nav-link" href="#contact">Contacto</a></li>
           </ul>
-          <Link to="/login" className="btn-import ms-2">Iniciar Sesión</Link>
+
+          {user ? (
+            <div className="d-flex align-items-center gap-3">
+              <span className="text-dark">👤 {nombre}</span>
+              <button className="btn btn-danger btn-sm" onClick={logout}>
+                Cerrar Sesión
+              </button>
+            </div>
+          ) : (
+            <Link to="/login" className="btn-import ms-2">Iniciar Sesión</Link>
+          )}
         </div>
       </nav>
     </header>
