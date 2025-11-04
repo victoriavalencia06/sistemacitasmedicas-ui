@@ -4,35 +4,26 @@ import { useState, useContext } from "react";
 import "../../assets/styles/Auth.css";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
-import Dashboard from "../Dashboard";
 
 export default function Login() {
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
   } = useForm();
 
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const password = watch("password", "");
-
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const onSubmit = async (data) => {
     try {
-      // Enviar a la API con password y passwordHash iguales
       const body = {
-        nombre: "algo",
         correo: data.email,
         password: data.password,
-        passwordHash: data.password, // el mismo valor
       };
-
       await login(body);
-      navigate("/dashboard"); // redirigir al Home
+      navigate("/dashboard");
     } catch (err) {
       console.error(err);
       alert("Error al iniciar sesión. Verifica tus credenciales.");
@@ -99,38 +90,6 @@ export default function Login() {
               {errors.password && (
                 <p className="text-danger small mt-1">
                   {errors.password.message}
-                </p>
-              )}
-            </div>
-
-            {/* Confirmar contraseña */}
-            <div className="mb-3 position-relative">
-              <label className="form-label">Confirmar contraseña</label>
-              <div className="password-wrapper">
-                <input
-                  type={showConfirmPassword ? "text" : "password"}
-                  className="form-control"
-                  placeholder="Confirma tu contraseña"
-                  {...register("confirmPassword", {
-                    required: "Debes confirmar la contraseña",
-                    validate: (value) =>
-                      value === password ||
-                      "Las contraseñas no coinciden",
-                  })}
-                />
-                <button
-                  type="button"
-                  className="toggle-password"
-                  onClick={() =>
-                    setShowConfirmPassword(!showConfirmPassword)
-                  }
-                >
-                  {showConfirmPassword ? <FaEye /> : <FaEyeSlash />}
-                </button>
-              </div>
-              {errors.confirmPassword && (
-                <p className="text-danger small mt-1">
-                  {errors.confirmPassword.message}
                 </p>
               )}
             </div>

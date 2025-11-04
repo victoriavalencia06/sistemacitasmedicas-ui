@@ -1,53 +1,76 @@
 import { createContext, useState, useEffect } from "react";
+import api from "../api/axios";
 
 export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // Decodifica el JWT para obtener el nombre y datos del usuario
+  // Función para decodificar y normalizar token JWT
   const decodeToken = (token) => {
     try {
       const payload = JSON.parse(atob(token.split(".")[1]));
-      return payload;
+      if (payload.exp && payload.exp * 1000 < Date.now()) return null;
+
+      // Normalización de claves comunes
+      const nombre =
+        payload.nombre ||
+        payload.name ||
+        payload["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"] ||
+        null;
+
+      const correo =
+        payload.correo ||
+        payload.email ||
+        payload["sub"] ||
+        null;
+
+      const rol =
+        payload.rol ||
+        payload.role ||
+        payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] ||
+        null;
+
+      const sub = payload.sub || payload.userId || payload.id || null;
+
+      return { nombre, correo, rol, sub, raw: payload };
     } catch {
       return null;
     }
   };
 
-  // Cargar usuario al iniciar
+  // Al cargar, revisar si hay token en localStorage
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
       const data = decodeToken(token);
-      setUser(data);
+      if (data) setUser(data);
+      else localStorage.removeItem("token");
     }
+    setLoading(false);
   }, []);
 
-const login = async ({ correo, password, passwordHash, nombre }) => {
-  const res = await fetch("http://Citas.somee.com/api/auth/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ correo, password, passwordHash, nombre }),
-  });
+  const login = async ({ correo, password }) => {
+    const res = await api.post("/auth/login", { correo, password });
 
-  if (!res.ok) throw new Error("Credenciales inválidas");
+    if (!res.data?.token) throw new Error("Credenciales inválidas");
 
-  const data = await res.json();
-  localStorage.setItem("token", data.token);
-
-  const decoded = decodeToken(data.token);
-  setUser(decoded);
-};
-
+    const token = res.data.token;
+    localStorage.setItem("token", token);
+    const decoded = decodeToken(token);
+    setUser(decoded);
+  };
 
   const logout = () => {
     localStorage.removeItem("token");
     setUser(null);
   };
 
+  const isAuthenticated = !!user;
+
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

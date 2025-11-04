@@ -5,10 +5,7 @@ import { AuthContext } from "../context/AuthContext";
 export default function Header() {
   const { user, logout } = useContext(AuthContext);
 
-  const nombre =
-    user?.[
-      "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
-    ] || user?.name || user?.sub;
+  const userName = user?.nombre || "Usuario";
 
   return (
     <header className="glass">
@@ -33,7 +30,7 @@ export default function Header() {
 
           {user ? (
             <div className="d-flex align-items-center gap-3">
-              <span className="text-dark">👤 {nombre}</span>
+              <span className="text-dark">👤 {userName}</span>
               <button className="btn btn-danger btn-sm" onClick={logout}>
                 Cerrar Sesión
               </button>

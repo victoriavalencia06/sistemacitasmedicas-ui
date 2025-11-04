@@ -8,8 +8,10 @@ function Dashboard() {
     const [currentScreen, setCurrentScreen] = React.useState('dashboard');
     const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
-    
+        
     const { user, logout } = useContext(AuthContext);
+    const userName = user?.nombre || "Usuario";
+
 
     const handleNavigate = (screen) => {
         setCurrentScreen(screen);
@@ -41,7 +43,7 @@ function Dashboard() {
                 return (
                     <div>
                         <h1>Bienvenido al Dashboard</h1>
-                        <p>Hola, {user?.name || user?.email}!</p>
+                        <p>Hola, {userName}!</p>
                         {/* Aquí puedes agregar más contenido del dashboard */}
                     </div>
                 );
