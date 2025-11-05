@@ -5,6 +5,7 @@ import Login from './pages/auth/Login';
 import Dashboard from './pages/Dashboard';
 import Register from './pages/auth/Register';
 import Home from './pages/Home';
+import Roles from './pages/Roles'
 
 function App() {
   const { isAuthenticated, loading } = useContext(AuthContext);
@@ -37,6 +38,11 @@ function App() {
         <Route
           path="/dashboard/*"
           element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" replace />}
+        />
+
+        <Route
+          path="/roles"
+          element={isAuthenticated ? <Roles /> : <Navigate to="/login" replace />}
         />
 
         <Route path="/" element={<Navigate to="/home" replace />} />

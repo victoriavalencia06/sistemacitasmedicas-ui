@@ -37,9 +37,9 @@ html, body {
     backdrop-filter: blur(10px);
     position: fixed;
     top: 0;
-    left: 0; /* Añadido */
-    right: 0; /* Añadido */
-    z-index: 1100; /* Aumentado */
+    left: 0;
+    right: 0;
+    z-index: 1100;
     width: 100%;
     box-sizing: border-box;
 }
@@ -184,7 +184,7 @@ html, body {
     border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-/* Main - CORREGIDO */
+/* Main */
 .dashboard-main {
     flex: 1;
     display: flex;
@@ -192,8 +192,8 @@ html, body {
     min-height: 100vh;
     margin-left: 280px;
     transition: margin-left 0.3s ease;
-    padding-top: 70px; /* Cambiado de margin-top a padding-top */
-    width: calc(100% - 280px); /* Añadido para evitar overflow */
+    padding-top: 70px;
+    width: calc(100% - 280px);
 }
 
 .dashboard-root.sidebar-collapsed .dashboard-main {
@@ -300,7 +300,7 @@ html, body {
 
 /* Content area */
 .dashboard-content {
-    padding: 30px;
+    padding: 10px;
     flex: 1;
     background: #f8fafc;
 }

@@ -1,19 +1,20 @@
 import React, { useContext } from 'react';
-import { AuthContext } from '../context/AuthContext'; // Ajusta la ruta
+import { AuthContext } from '../context/AuthContext';
 import Topbar from '../components/dashboard/Topbar';
 import Sidebar from '../components/dashboard/Sidebar';
 import '../assets/styles/Dashboard.css';
+import Roles from '../pages/Roles'; // Importa el componente Roles
 
 function Dashboard() {
     const [currentScreen, setCurrentScreen] = React.useState('dashboard');
     const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
-        
+
     const { user, logout } = useContext(AuthContext);
     const userName = user?.nombre || "Usuario";
 
-
     const handleNavigate = (screen) => {
+        console.log('🔄 Navegando a:', screen); // Para debug
         setCurrentScreen(screen);
         // En móviles, cerrar el menú después de navegar
         if (window.innerWidth <= 768) {
@@ -38,6 +39,8 @@ function Dashboard() {
 
     // Renderizar el contenido según la pantalla actual
     const renderContent = () => {
+        console.log('🎯 Pantalla actual:', currentScreen); // Para debug
+
         switch (currentScreen) {
             case 'dashboard':
                 return (
@@ -53,6 +56,8 @@ function Dashboard() {
                 return <Doctors />;
             case 'patients':
                 return <Users />;
+            case 'roles':
+                return <Roles />;
             case 'reports':
                 return <Reports />;
             case 'notifications':

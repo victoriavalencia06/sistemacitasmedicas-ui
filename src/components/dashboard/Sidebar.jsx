@@ -7,7 +7,8 @@ import {
   FaChartBar,
   FaCog,
   FaBell,
-  FaClipboardList
+  FaClipboardList,
+  FaUsersCog // Nuevo icono para Roles
 } from "react-icons/fa";
 import { AuthContext } from "../../context/AuthContext";
 
@@ -34,6 +35,7 @@ export default function Sidebar({ currentScreen, onNavigate, collapsed }) {
           { id: "appointments", label: "Citas", icon: FaCalendar },
           { id: "patients", label: "Pacientes", icon: FaUser },
           { id: "doctors", label: "Médicos", icon: FaUserMd },
+          { id: "roles", label: "Roles", icon: FaUsersCog }, // Nuevo item
           { id: "reports", label: "Reportes", icon: FaClipboardList },
           { id: "notifications", label: "Notificaciones", icon: FaBell }
         ];

@@ -9,6 +9,9 @@ import { AuthProvider } from "./context/AuthContext.jsx";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
+// Alertas con SweetAlert2
+import 'sweetalert2/dist/sweetalert2.min.css';
+
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>

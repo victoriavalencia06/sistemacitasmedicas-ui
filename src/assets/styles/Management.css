@@ -1,0 +1,523 @@
+/* === ESTILOS PARA GESTIÓN (Roles, Citas, Doctores, etc.) === */
+
+/* Contenedor principal de gestión */
+.management-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header de página de gestión */
+.management-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.management-title {
+    color: #3a6670;
+    font-weight: 700;
+    font-size: 1.8rem;
+    margin: 0;
+}
+
+/* Botones de acción */
+.btn-management {
+    background-color: #004794;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-management:hover {
+    background-color: #0b66c7;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 71, 148, 0.2);
+}
+
+.btn-management-secondary {
+    background-color: #6f8d97;
+    color: white;
+}
+
+.btn-management-secondary:hover {
+    background-color: #5a727a;
+}
+
+.btn-management-danger {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btn-management-danger:hover {
+    background-color: #c82333;
+}
+
+/* Tarjetas de gestión */
+.management-card {
+    background-color: white;
+    border-radius: 14px;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+    padding: 25px;
+    margin-bottom: 25px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* Estados de carga */
+.management-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 20px;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #e8f0fe;
+    border-top: 4px solid #004794;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Estados vacíos */
+.management-empty {
+    text-align: center;
+    padding: 60px 20px;
+    background: linear-gradient(135deg, #f6fbff, #ffffff);
+    border-radius: 14px;
+    border: 2px dashed #d4e9f9;
+}
+
+.management-empty-icon {
+    font-size: 3rem;
+    color: #7cc5e7;
+    margin-bottom: 15px;
+}
+
+.management-empty-title {
+    color: #3a6670;
+    font-weight: 600;
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+}
+
+.management-empty-text {
+    color: #6f8d97;
+    margin-bottom: 20px;
+}
+
+/* === TABLAS DE GESTIÓN === */
+.management-table-container {
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.management-table-header {
+    background: linear-gradient(135deg, #004794, #0b66c7);
+    color: white;
+    padding: 20px 25px;
+}
+
+.management-table-title {
+    font-weight: 700;
+    font-size: 1.3rem;
+    margin: 0;
+}
+
+.management-table-subtitle {
+    opacity: 0.9;
+    font-size: 0.9rem;
+    margin: 5px 0 0 0;
+}
+
+.management-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+}
+
+.management-table th {
+    background-color: #f8fafc;
+    color: #3a6670;
+    font-weight: 600;
+    padding: 15px 20px;
+    text-align: left;
+    border-bottom: 2px solid #e8f0fe;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.management-table td {
+    padding: 15px 20px;
+    border-bottom: 1px solid #e8f0fe;
+    color: #5f6368;
+    vertical-align: middle;
+}
+
+.management-table tbody tr {
+    transition: all 0.2s ease;
+}
+
+.management-table tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+.management-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Filas alternadas */
+.management-table tbody tr:nth-child(even) {
+    background-color: #fafcfd;
+}
+
+.management-table tbody tr:nth-child(even):hover {
+    background-color: #f3f6fa;
+}
+
+/* Badges de estado */
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-block;
+    text-align: center;
+    min-width: 70px;
+}
+
+.status-active {
+    background-color: #e8f5e8;
+    color: #2e7d32;
+}
+
+.status-inactive {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+.status-pending {
+    background-color: #fff3e0;
+    color: #ef6c00;
+}
+
+/* === FORMULARIOS DE GESTIÓN === */
+.management-form-container {
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.management-form-header {
+    background: linear-gradient(135deg, #004794, #0b66c7);
+    color: white;
+    padding: 20px 25px;
+}
+
+.management-form-title {
+    font-weight: 700;
+    font-size: 1.3rem;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.management-form-subtitle {
+    opacity: 0.9;
+    font-size: 0.9rem;
+    margin: 5px 0 0 0;
+}
+
+.management-form {
+    padding: 25px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    color: #3a6670;
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+.form-label.required::after {
+    content: " *";
+    color: #dc3545;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    background-color: white;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #004794;
+    box-shadow: 0 0 0 3px rgba(0, 71, 148, 0.1);
+}
+
+.form-control.error {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+}
+
+.form-error {
+    color: #dc3545;
+    font-size: 0.85rem;
+    margin-top: 5px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Acciones de formulario */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    padding-top: 20px;
+    border-top: 1px solid #e8f0fe;
+    margin-top: 25px;
+}
+
+/* === COMPONENTES ESPECÍFICOS PARA ROLES === */
+.role-badge {
+    background: #eef6ff;
+    color: #004794;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.role-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.role-actions .btn-management {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+
+/* === PAGINACIÓN === */
+.management-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding: 15px 20px;
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.pagination-info {
+    color: #6f8d97;
+    font-size: 0.9rem;
+}
+
+.pagination {
+    margin: 0;
+}
+
+.page-link {
+    color: #004794;
+    border: 1px solid #e0e0e0;
+    padding: 8px 12px;
+    margin: 0 2px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    background: white;
+    text-decoration: none;
+    display: block;
+}
+
+.page-link:hover {
+    background-color: #eef6ff;
+    color: #004794;
+    border-color: #004794;
+}
+
+.page-item.active .page-link {
+    background-color: #004794;
+    border-color: #004794;
+    color: white;
+}
+
+.page-item.disabled .page-link {
+    color: #6f8d97;
+    background-color: #f8f9fa;
+    border-color: #e0e0e0;
+    cursor: not-allowed;
+}
+
+/* Tabla responsive */
+.table-responsive {
+    overflow-x: auto;
+}
+
+/* Asegurar que los iconos de React se alineen bien */
+.btn-management svg,
+.role-badge svg,
+.form-error svg {
+    margin-right: 6px;
+    font-size: 0.9em;
+}
+
+.management-empty-icon svg {
+    margin-right: 0;
+}
+
+/* Los iconos en los botones de paginación */
+.page-link svg {
+    margin-right: 0;
+}
+
+/* Busqueda */
+.management-filters {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    gap: 1rem;
+}
+
+.search-input {
+    position: relative;
+    flex: 1;
+}
+
+.search-input input {
+    width: 100%;
+    padding: 8px 32px 8px 28px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+.search-icon {
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+}
+
+.filter-select {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .management-container {
+        padding: 15px;
+    }
+
+    .management-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+
+    .management-title {
+        font-size: 1.5rem;
+    }
+
+    .management-table {
+        min-width: 600px;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .btn-management {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .role-actions {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .management-pagination {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+
+    .pagination {
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 480px) {
+    .management-card {
+        padding: 20px 15px;
+    }
+
+    .management-form {
+        padding: 20px 15px;
+    }
+
+    .management-table-header,
+    .management-form-header {
+        padding: 15px 20px;
+    }
+
+    .management-table th,
+    .management-table td {
+        padding: 10px 15px;
+    }
+}
