@@ -8,12 +8,13 @@
     --radius: 12px;
 }
 
-html, body {
+html,
+body {
     margin: 0;
     padding: 0;
     height: 100%;
     box-sizing: border-box;
-    overflow-x: hidden; /* Prevenir scroll horizontal */
+    overflow-x: hidden;
 }
 
 /* Layout root */
@@ -59,7 +60,7 @@ html, body {
     gap: 20px;
     box-shadow: 0 6px 24px rgba(3, 41, 70, 0.03);
     transition: all 0.3s ease;
-    z-index: 1000; /* Menor que topbar */
+    z-index: 1000;
     overflow-y: auto;
 }
 
@@ -198,7 +199,7 @@ html, body {
 
 .dashboard-root.sidebar-collapsed .dashboard-main {
     margin-left: 80px;
-    width: calc(100% - 80px); /* Añadido para evitar overflow */
+    width: calc(100% - 80px);
 }
 
 .topbar-left {
@@ -315,9 +316,10 @@ html, body {
     bottom: 0;
     background: rgba(0, 0, 0, 0.5);
     z-index: 900;
+    backdrop-filter: blur(2px);
 }
 
-/* Responsive */
+/* Responsive - CORREGIDO */
 @media (max-width: 768px) {
     .dashboard-topbar {
         padding: 0 20px;
@@ -332,8 +334,10 @@ html, body {
         transform: translateX(-100%);
         width: 280px;
         z-index: 1000;
+        transition: transform 0.3s ease;
     }
 
+    /* Clase para mostrar sidebar en móvil */
     .dashboard-sidebar.mobile-open {
         transform: translateX(0);
     }
@@ -346,7 +350,6 @@ html, body {
 
     .dashboard-content {
         margin-left: 0 !important;
-        /* Sin margin-top aquí */
     }
 
     .brand-name {
@@ -356,34 +359,27 @@ html, body {
     .topbar-brand {
         border-right: none;
         padding-right: 0;
+        margin-left: 0;
     }
 
     .user-name {
         display: none;
     }
 
-    /* Overlay para móviles */
-    .sidebar-overlay {
-        top: 70px;
-        z-index: 900;
-    }
-
-    .dashboard-root:not(.sidebar-collapsed) .sidebar-overlay {
+    /* Overlay para móviles - SOLO cuando sidebar está abierto */
+    .sidebar-overlay.mobile-open {
         display: block;
     }
-}
 
-@media (max-width: 480px) {
-    .dashboard-topbar {
-        padding: 0 15px;
+    /* En móvil, ignoramos el estado collapsed */
+    .dashboard-sidebar.collapsed {
+        width: 280px;
+        padding: 20px;
+        transform: translateX(-100%);
     }
 
-    .dashboard-content {
-        padding: 15px;
-    }
-
-    .current-page-title {
-        font-size: 1.3rem;
+    .dashboard-sidebar.collapsed.mobile-open {
+        transform: translateX(0);
     }
 }
 
@@ -395,6 +391,11 @@ html, body {
     }
 
     .sidebar-overlay {
+        display: none !important;
+    }
+
+    /* En desktop, el overlay nunca se muestra */
+    .sidebar-overlay.mobile-open {
         display: none !important;
     }
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { FaPlus, FaSearch } from 'react-icons/fa';
 import RolList from '../components/roles/RolList';
 import RolForm from '../components/roles/RolForm';
@@ -10,26 +10,43 @@ import '../assets/styles/Management.css';
 
 const Roles = () => {
     const [roles, setRoles] = useState([]);
-    const [filteredRoles, setFilteredRoles] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [showForm, setShowForm] = useState(false);
     const [editingRol, setEditingRol] = useState(null);
 
     const [searchTerm, setSearchTerm] = useState('');
-    const [filterEstado, setFilterEstado] = useState('todos'); // todos | activos | inactivos
-
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(5);
-    const [totalItems, setTotalItems] = useState(0);
+
+    const filteredRoles = useMemo(() => {
+        let result = [...roles];
+        if (searchTerm.trim() !== '') {
+            result = result.filter(r =>
+                r.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
+        return result;
+    }, [roles, searchTerm]);
+
+    const currentPageRoles = useMemo(() => {
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        return filteredRoles.slice(startIndex, endIndex);
+    }, [filteredRoles, currentPage, itemsPerPage]);
+
+    const totalItems = filteredRoles.length;
+    const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
 
     useEffect(() => {
         loadRoles();
-    }, [currentPage]);
+    }, []);
 
     useEffect(() => {
-        filterRoles();
-    }, [searchTerm, filterEstado, roles]);
+        if (currentPage > totalPages && totalPages > 0) {
+            setCurrentPage(totalPages);
+        }
+    }, [totalPages, currentPage]);
 
     const loadRoles = async () => {
         setLoading(true);
@@ -51,7 +68,6 @@ const Roles = () => {
             });
 
             setRoles(mapped);
-            setTotalItems(mapped.length);
         } catch (err) {
             const errorMessage = err?.message || 'Error al cargar los roles';
             setError(errorMessage);
@@ -59,27 +75,6 @@ const Roles = () => {
         } finally {
             setLoading(false);
         }
-    };
-
-    // 🔍 Filtrado por búsqueda y estado
-    const filterRoles = () => {
-        let result = [...roles];
-
-        if (searchTerm.trim() !== '') {
-            result = result.filter(r =>
-                r.nombre.toLowerCase().includes(searchTerm.toLowerCase())
-            );
-        }
-
-        if (filterEstado === 'activos') {
-            result = result.filter(r => r.estado === true);
-        } else if (filterEstado === 'inactivos') {
-            result = result.filter(r => r.estado === false);
-        }
-
-        setFilteredRoles(result);
-        setTotalItems(result.length);
-        setCurrentPage(1); // reset al cambiar filtro
     };
 
     const handleCreate = () => {
@@ -110,7 +105,6 @@ const Roles = () => {
         try {
             await rolService.delete(id);
             await loadRoles();
-            if (roles.length === 1 && currentPage > 1) setCurrentPage(1);
         } catch (err) { }
     };
 
@@ -157,50 +151,40 @@ const Roles = () => {
         }
     };
 
-    const getCurrentPageRoles = () => {
-        const startIndex = (currentPage - 1) * itemsPerPage;
-        const endIndex = startIndex + itemsPerPage;
-        return filteredRoles.slice(startIndex, endIndex);
-    };
-
-    const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
-
     const handlePageChange = (pageNumber) => {
         if (pageNumber < 1 || pageNumber > totalPages) return;
         setCurrentPage(pageNumber);
+    };
+
+    const handleSearchChange = (value) => {
+        setSearchTerm(value);
+        setCurrentPage(1);
     };
 
     return (
         <div className="management-container">
             <div className="management-header">
                 <h1 className="management-title">Gestión de Roles</h1>
-                <button onClick={handleCreate} className="btn-management">
-                    <FaPlus style={{ marginRight: 6 }} /> Nuevo Rol
-                </button>
+                {!showForm && (
+                    <button onClick={handleCreate} className="btn-management">
+                        <FaPlus style={{ marginRight: 6 }} /> Nuevo Rol
+                    </button>
+                )}
             </div>
 
-            {/* 🔍 Barra de búsqueda y filtro */}
-            <div className="management-filters">
-                <div className="search-input">
-                    <FaSearch className="search-icon" />
-                    <input
-                        type="text"
-                        placeholder="Buscar por nombre..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
+            {!showForm && (
+                <div className="management-filters">
+                    <div className="search-input">
+                        <FaSearch className="search-icon" />
+                        <input
+                            type="text"
+                            placeholder="Buscar por nombre..."
+                            value={searchTerm}
+                            onChange={(e) => handleSearchChange(e.target.value)}
+                        />
+                    </div>
                 </div>
-
-                <select
-                    className="filter-select"
-                    value={filterEstado}
-                    onChange={(e) => setFilterEstado(e.target.value)}
-                >
-                    <option value="todos">Todos</option>
-                    <option value="activos">Activos</option>
-                    <option value="inactivos">Inactivos</option>
-                </select>
-            </div>
+            )}
 
             <AlertMessage type="error" message={error} />
 
@@ -208,7 +192,12 @@ const Roles = () => {
                 <RolForm rol={editingRol} onSubmit={handleFormSubmit} onCancel={handleCancel} />
             ) : (
                 <>
-                    <RolList roles={getCurrentPageRoles()} loading={loading} onEdit={handleEdit} onDelete={handleDelete} />
+                    <RolList
+                        roles={currentPageRoles}
+                        loading={loading}
+                        onEdit={handleEdit}
+                        onDelete={handleDelete}
+                    />
                     {totalPages > 1 && (
                         <Pagination
                             currentPage={currentPage}

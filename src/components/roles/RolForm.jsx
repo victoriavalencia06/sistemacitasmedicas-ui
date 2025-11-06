@@ -1,21 +1,19 @@
-// src/components/roles/RolForm.jsx
 import React, { useState, useEffect } from 'react';
 import { FaUserTag, FaSave, FaPlus, FaTimes, FaExclamationCircle } from 'react-icons/fa';
+import Swal from 'sweetalert2';
 
 const RolForm = ({ rol, onSubmit, onCancel }) => {
     const [formData, setFormData] = useState({
         nombre: '',
-        estado: true // UI uses boolean
+        estado: true
     });
     const [errors, setErrors] = useState({});
 
     useEffect(() => {
         if (rol) {
-            // rol.estado puede venir como 1/0 o true/false desde API; convertir a boolean
-            const estadoBool = rol.estado === 1 || rol.estado === true;
             setFormData({
                 nombre: rol.nombre ?? '',
-                estado: estadoBool
+                estado: rol.estado ?? true
             });
         } else {
             setFormData({ nombre: '', estado: true });
@@ -23,15 +21,21 @@ const RolForm = ({ rol, onSubmit, onCancel }) => {
     }, [rol]);
 
     const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
+        const { name, value } = e.target;
         setFormData(prev => ({
             ...prev,
-            [name]: type === 'checkbox' ? checked : value
+            [name]: value
         }));
-
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: '' }));
         }
+    };
+
+    const handleToggle = () => {
+        setFormData(prev => ({
+            ...prev,
+            estado: !prev.estado
+        }));
     };
 
     const validateForm = () => {
@@ -45,15 +49,37 @@ const RolForm = ({ rol, onSubmit, onCancel }) => {
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = (e) => {
+    // Manejo de submit: si es edición y el rol quedará inactivo, mostrar confirmación
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (!validateForm()) return;
 
-        // Devuelve datos en forma UI (nombre, estado boolean). El page mapeará a DTO.
-        onSubmit({
+        const payload = {
             nombre: formData.nombre.trim(),
-            estado: formData.estado
-        });
+            estado: rol ? formData.estado : true
+        };
+
+        // Si estamos editando (rol existe) y el estado será inactivo -> pedir confirmación
+        if (rol && payload.estado === false) {
+            const result = await Swal.fire({
+                title: 'Vas a dejar el rol inactivo',
+                html: 'Si guardas este rol como <strong>inactivo</strong>, no podrá ser asignado ni utilizado en el sistema. ¿Deseas continuar?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, guardar inactivo',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true,
+                focusCancel: true
+            });
+
+            if (!result.isConfirmed) {
+                // El usuario canceló la acción de guardar inactivo
+                return;
+            }
+        }
+
+        // Si no se pidió confirmación o el usuario confirmó, enviamos
+        onSubmit(payload);
     };
 
     return (
@@ -64,13 +90,17 @@ const RolForm = ({ rol, onSubmit, onCancel }) => {
                     {rol ? 'Editar Rol' : 'Crear Nuevo Rol'}
                 </h2>
                 <p className="management-form-subtitle">
-                    {rol ? 'Actualiza la información del rol' : 'Completa la información para crear un nuevo rol'}
+                    {rol
+                        ? 'Actualiza la información del rol existente'
+                        : 'Completa la información para crear un nuevo rol'}
                 </p>
             </div>
 
             <form onSubmit={handleSubmit} className="management-form">
                 <div className="form-group">
-                    <label htmlFor="nombre" className="form-label required">Nombre del Rol</label>
+                    <label htmlFor="nombre" className="form-label required">
+                        Nombre del Rol
+                    </label>
                     <input
                         type="text"
                         id="nombre"
@@ -88,29 +118,58 @@ const RolForm = ({ rol, onSubmit, onCancel }) => {
                     )}
                 </div>
 
-                <div className="form-group">
-                    <label className="form-label">Estado del Rol</label>
-                    <div className="form-check">
-                        <input
-                            type="checkbox"
-                            id="estado"
-                            name="estado"
-                            checked={formData.estado}
-                            onChange={handleChange}
-                            className="form-check-input"
-                        />
-                        <label htmlFor="estado" className="form-check-label">Rol activo</label>
+                {rol ? (
+                    <div className="form-group">
+                        <label className="form-label">Estado del Rol</label>
+                        <div className="switch-container">
+                            <label className="switch">
+                                <input
+                                    type="checkbox"
+                                    checked={formData.estado}
+                                    onChange={handleToggle}
+                                />
+                                <span className="slider"></span>
+                            </label>
+                            <span className="switch-label">
+                                {formData.estado ? 'Activo' : 'Inactivo'}
+                            </span>
+                        </div>
+
+                        {/* Mensaje inline cuando está inactivo para feedback inmediato */}
+                        {!formData.estado && (
+                            <div className="inline-warning" role="status">
+                                <strong>Atención:</strong> si guarda el rol inactivo, no podrá ser usado ni asignado.
+                            </div>
+                        )}
                     </div>
-                    <small className="text-muted">Los roles inactivos no podrán ser asignados a nuevos usuarios</small>
-                </div>
+                ) : (
+                    <div className="form-group">
+                        <label className="form-label">Estado del Rol</label>
+                        <p className="text-muted">
+                            Este rol está <strong>activo por defecto</strong>.
+                        </p>
+                    </div>
+                )}
 
                 <div className="form-actions">
-                    <button type="button" onClick={onCancel} className="btn-management btn-management-secondary">
+                    <button
+                        type="button"
+                        onClick={onCancel}
+                        className="btn-management btn-management-secondary"
+                    >
                         <FaTimes style={{ marginRight: 6 }} /> Cancelar
                     </button>
 
                     <button type="submit" className="btn-management">
-                        {rol ? <><FaSave style={{ marginRight: 6 }} />Actualizar Rol</> : <><FaPlus style={{ marginRight: 6 }} />Crear Rol</>}
+                        {rol ? (
+                            <>
+                                <FaSave style={{ marginRight: 6 }} /> Actualizar Rol
+                            </>
+                        ) : (
+                            <>
+                                <FaPlus style={{ marginRight: 6 }} /> Crear Rol
+                            </>
+                        )}
                     </button>
                 </div>
             </form>

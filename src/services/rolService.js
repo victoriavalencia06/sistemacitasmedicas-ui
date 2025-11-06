@@ -5,12 +5,12 @@ import Swal from 'sweetalert2';
 function extractValidationMessages(apiData) {
     const msgs = [];
     const errors = apiData?.errors;
-    
+
     if (!errors) {
         if (apiData?.message) msgs.push(apiData.message);
         return msgs;
     }
-    
+
     for (const key of Object.keys(errors)) {
         const arr = errors[key];
         if (Array.isArray(arr)) arr.forEach(m => msgs.push(`${key}: ${m}`));
@@ -43,7 +43,13 @@ const rolService = {
     // Crear nuevo rol - datos: { Nombre: string, Estado: number }
     create: async (rolData) => {
         try {
-            const response = await api.post('/rol/create', rolData, {
+            // Asignar el estado activo por defecto
+            const dataToSend = {
+                ...rolData,
+                estado: 1
+            };
+
+            const response = await api.post('/rol/create', dataToSend, {
                 headers: { 'Content-Type': 'application/json' }
             });
 
@@ -59,7 +65,9 @@ const rolService = {
         } catch (error) {
             const apiData = error.response?.data;
             const msgs = extractValidationMessages(apiData);
-            const display = msgs.length ? msgs.join('\n') : (apiData?.message || 'Error al crear el rol');
+            const display = msgs.length
+                ? msgs.join('\n')
+                : (apiData?.message || 'Error al crear el rol');
 
             await Swal.fire({
                 icon: 'error',
@@ -70,6 +78,7 @@ const rolService = {
             throw apiData || new Error(display);
         }
     },
+
 
     // Actualizar rol - datos: { idRol:int, Nombre: string, Estado: number }
     update: async (id, rolData) => {
@@ -106,7 +115,7 @@ const rolService = {
     delete: async (id) => {
         try {
             const response = await api.delete(`/rol/delete/${id}`);
-            
+
             await Swal.fire({
                 icon: 'success',
                 title: 'Eliminado',
@@ -114,7 +123,7 @@ const rolService = {
                 timer: 1200,
                 showConfirmButton: false
             });
-            
+
             return response.data;
         } catch (error) {
             const apiData = error.response?.data;
