@@ -3,7 +3,9 @@ import { AuthContext } from '../context/AuthContext';
 import Topbar from '../components/dashboard/Topbar';
 import Sidebar from '../components/dashboard/Sidebar';
 import '../assets/styles/Dashboard.css';
-import Roles from '../pages/Roles'; // Importa el componente Roles
+import Roles from '../pages/Roles';
+import Citas from '../pages/Citas';
+import Usuarios from '../pages/Usuarios';
 
 function Dashboard() {
     const [currentScreen, setCurrentScreen] = React.useState('dashboard');
@@ -34,6 +36,13 @@ function Dashboard() {
         }
     };
 
+    // Función para cerrar el sidebar en móvil
+    const closeMobileSidebar = () => {
+        if (window.innerWidth <= 768) {
+            setMobileMenuOpen(false);
+        }
+    };
+
     // Determinar si el sidebar debe mostrarse como colapsado
     const isSidebarCollapsed = window.innerWidth <= 768 ? !mobileMenuOpen : sidebarCollapsed;
 
@@ -51,17 +60,21 @@ function Dashboard() {
                     </div>
                 );
             case 'appointments':
-                return <Appointments />;
+                return <div><h1>Citas</h1><p>Gestión de citas médicas</p></div>;
             case 'doctors':
-                return <Doctors />;
+                return <div><h1>Médicos</h1><p>Gestión de médicos</p></div>;
             case 'patients':
-                return <Users />;
+                return <div><h1>Pacientes</h1><p>Gestión de pacientes</p></div>;
             case 'roles':
                 return <Roles />;
             case 'reports':
-                return <Reports />;
+                return <div><h1>Reportes</h1><p>Reportes del sistema</p></div>;
             case 'notifications':
-                return <Notifications />;
+                return <div><h1>Notificaciones</h1><p>Gestión de notificaciones</p></div>;
+            case 'citas':
+                return <Citas />;
+            case 'usuarios':
+                return <Usuarios />;
             default:
                 return (
                     <div>
@@ -78,7 +91,8 @@ function Dashboard() {
                 currentScreen={currentScreen}
                 onNavigate={handleNavigate}
                 collapsed={isSidebarCollapsed}
-                onToggle={toggleSidebar}
+                isMobileOpen={mobileMenuOpen}
+                onCloseMobile={closeMobileSidebar}
             />
 
             <div className="dashboard-main">

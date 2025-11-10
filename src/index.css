@@ -1,14 +1,34 @@
+:root {
+  /* Paleta principal */
+  --bg: #f6fbff;
+  --card: #ffffff;
+  --muted: #6f8d97;
+  --accent: #004794;
+  --accent-soft: rgba(0, 71, 148, 0.06);
+  --glass: rgba(255, 255, 255, 0.7);
+  --radius: 12px;
+
+  /* Colores adicionales */
+  --text-primary: #14323f;
+  --text-secondary: #6f8d97;
+  --blue-primary: #004794;
+  --blue-light: #7cc5e7;
+  --blue-soft: rgba(0, 71, 148, 0.1);
+  --teal: #009688;
+  --teal-dark: #00796b;
+}
+
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #f9fcfe;
-  color: #3a6670;
+  background: var(--bg);
+  color: var(--text-primary);
   margin: 0;
   padding: 0;
 }
 
 /* Navbar */
 header.glass {
-  background: #fff;
+  background: var(--card);
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
   position: sticky;
@@ -23,40 +43,42 @@ header.glass {
 .navbar-brand {
   font-weight: 700;
   font-size: 1.3rem;
-  color: #3a6670 !important;
+  color: var(--text-primary) !important;
   letter-spacing: 0.2px;
 }
 
 .nav-link {
-  color: #00b0d8;
+  color: var(--blue-primary);
   font-weight: 500;
 }
 
 .nav-link:hover,
 .nav-link.active {
-  color: #7cc5e7;
+  color: var(--blue-light);
 }
 
 /* Botón Iniciar Sesión */
 .btn-import {
-  background-color: #004794;
+  background-color: var(--accent);
   color: white;
   font-weight: 600;
   padding: 0.45rem 1rem;
-  border-radius: 0.3rem;
+  border-radius: var(--radius);
   border: none;
   text-decoration: none;
+  transition: all 0.3s ease;
 }
 
 .btn-import:hover {
   background-color: #0b66c7;
   color: white;
+  transform: translateY(-1px);
 }
 
 /* Home Hero */
 .hero {
-  background: linear-gradient(180deg, #d0e8f8 0%, #ffffff 80%);
-  color: #05345b;
+  background: linear-gradient(180deg, #d0e8f8 0%, var(--bg) 80%);
+  color: var(--text-primary);
   padding: 60px 0;
   border-radius: 0 0 36px 36px;
 }
@@ -64,10 +86,11 @@ header.glass {
 .hero .display-4 {
   font-size: 2rem;
   line-height: 1.15;
+  color: var(--accent);
 }
 
 .hero .lead {
-  color: rgba(5, 52, 91, 0.9);
+  color: var(--text-secondary);
 }
 
 .hero img {
@@ -79,9 +102,8 @@ header.glass {
 /* Departments */
 .departments-section {
   padding: 60px 20px;
-  background: #f9fcfe;
+  background: var(--bg);
   font-family: 'Segoe UI', sans-serif;
-  color: #333;
 }
 
 /* Encabezado */
@@ -93,7 +115,7 @@ header.glass {
 .section-subtitle {
   font-size: 14px;
   font-weight: bold;
-  color: #009688;
+  color: var(--teal);
   letter-spacing: 1.5px;
 }
 
@@ -101,12 +123,12 @@ header.glass {
   font-size: 32px;
   font-weight: 700;
   margin: 10px 0;
-  color: #222;
+  color: var(--text-primary);
 }
 
 .section-description {
   font-size: 16px;
-  color: #666;
+  color: var(--text-secondary);
   max-width: 600px;
   margin: 0 auto;
 }
@@ -129,19 +151,22 @@ header.glass {
 
 /* Tarjeta */
 .department-thumbnail {
-  background: rgba(255, 255, 255, 0.6);
-  border-radius: 14px;
+  background: var(--card);
+  border-radius: var(--radius);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
   backdrop-filter: blur(10px);
   padding: 30px 10px;
   text-align: center;
   cursor: pointer;
   transition: all 0.3s ease;
+  border: 1px solid var(--accent-soft);
 }
 
 .department-thumbnail:hover {
   transform: translateY(-5px);
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--card);
+  box-shadow: 0 8px 25px rgba(0, 71, 148, 0.12);
+  border-color: var(--accent-soft);
 }
 
 .icon-wrapper {
@@ -153,31 +178,33 @@ header.glass {
 .thumbnail-title {
   font-size: 1rem;
   font-weight: 600;
-  color: #222;
+  color: var(--text-primary);
 }
 
 /* Contenido desplegable */
 .department-content {
   width: 100%;
   max-width: 800px;
-  background: white;
-  border-radius: 12px;
+  background: var(--card);
+  border-radius: var(--radius);
   padding: 25px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
   margin-top: 30px;
   position: relative;
   animation: fadeIn 0.4s ease;
+  border: 1px solid var(--accent-soft);
 }
 
 .department-title {
   font-size: 24px;
   font-weight: bold;
   margin-bottom: 12px;
+  color: var(--text-primary);
 }
 
 .department-description {
   font-size: 15px;
-  color: #555;
+  color: var(--text-secondary);
   margin-bottom: 18px;
 }
 
@@ -193,15 +220,16 @@ header.glass {
   align-items: center;
   gap: 8px;
   font-size: 15px;
+  color: var(--text-primary);
 }
 
 .check-icon {
-  color: #009688;
+  color: var(--teal);
   font-weight: bold;
 }
 
 .know-more-btn {
-  background: #009688;
+  background: var(--teal);
   color: white;
   padding: 10px 18px;
   border: none;
@@ -209,10 +237,11 @@ header.glass {
   cursor: pointer;
   font-size: 15px;
   transition: background 0.3s ease;
+  font-weight: 600;
 }
 
 .know-more-btn:hover {
-  background: #00796b;
+  background: var(--teal-dark);
 }
 
 /* Botón cerrar */
@@ -223,7 +252,7 @@ header.glass {
   background: transparent;
   border: none;
   font-size: 28px;
-  color: #333;
+  color: var(--text-primary);
   cursor: pointer;
 }
 
@@ -241,8 +270,8 @@ header.glass {
 
 .contact-icon {
   font-size: 1.8rem;
-  background-color: #d4e9f9;
-  color: #7cc5e7;
+  background-color: var(--accent-soft);
+  color: var(--blue-primary);
   width: 60px;
   height: 60px;
   margin: 0 auto 1rem auto;
@@ -256,27 +285,27 @@ header.glass {
   font-weight: 700;
   font-size: 1.1rem;
   margin-bottom: 0.3rem;
-  color: #3a6670;
+  color: var(--text-primary);
 }
 
 .contact-titles {
   font-weight: 700;
   font-size: 28px;
-  color: #3a6670;
+  color: var(--text-primary);
   margin-bottom: 0.5rem;
 }
 
 .contact-text {
   font-size: 0.9rem;
-  color: #6f8d97;
+  color: var(--text-secondary);
   line-height: 1.4;
 }
 
 /* About Us */
 .about-section {
   padding: 3rem 0;
-  background-color: white;
-  color: #3a6670;
+  background-color: var(--card);
+  color: var(--text-primary);
 }
 
 .section-header {
@@ -287,7 +316,7 @@ header.glass {
   font-size: 1rem;
   text-transform: uppercase;
   letter-spacing: 2px;
-  color: #7cc5e7;
+  color: var(--blue-light);
   margin-bottom: 0.5rem;
 }
 
@@ -295,7 +324,7 @@ header.glass {
   font-size: 2.2rem;
   font-weight: 700;
   margin-bottom: 1rem;
-  color: #3a6670;
+  color: var(--text-primary);
 }
 
 .about-content-simple {
@@ -308,7 +337,7 @@ header.glass {
 }
 
 .about-image {
-  border-radius: 10px;
+  border-radius: var(--radius);
   overflow: hidden;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
@@ -332,13 +361,13 @@ header.glass {
 .about-intro {
   font-size: 1.2rem;
   line-height: 1.7;
-  color: #3a6670;
+  color: var(--text-primary);
   margin-bottom: 1.5rem;
   font-weight: 500;
 }
 
 .about-details {
-  color: #6f8d97;
+  color: var(--text-secondary);
   line-height: 1.7;
 }
 
@@ -347,7 +376,7 @@ header.glass {
 }
 
 .about-details strong {
-  color: #3a6670;
+  color: var(--text-primary);
   font-weight: 600;
 }
 
@@ -360,7 +389,7 @@ header.glass {
 .clinic-locations li {
   padding: 0.3rem 0;
   font-size: 1.1rem;
-  color: #3a6670;
+  color: var(--text-primary);
   font-weight: 500;
 }
 
@@ -369,7 +398,7 @@ header.glass {
   font-size: 0.85rem;
   color: var(--text-secondary);
   padding: 2rem 1rem 2rem;
-  background-color: #cce0f3;
+  background-color: var(--accent-soft);
 }
 
 .footer-sections {
@@ -420,7 +449,7 @@ header.glass {
 }
 
 .logo-dot {
-  background-color: #acc3e2;
+  background-color: var(--blue-primary);
   color: white;
   border-radius: 50%;
   width: 24px;
@@ -439,135 +468,42 @@ header.glass {
   user-select: none;
 }
 
-/* Dashboard layout */
+/* Dashboard layout - Manteniendo tus estilos existentes */
 .dashboard-root {
   display: flex;
   min-height: 100vh;
-  background: #f5f9fb;
+  background: var(--bg);
 }
 
-/* Sidebar */
 .dashboard-sidebar {
-  width: 72px;
-  /* compacto: solo icons */
-  background: white;
+  background: var(--card);
   border-right: 1px solid rgba(0, 0, 0, 0.06);
-  padding: 18px 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  align-items: center;
-}
-
-.sidebar-brand {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.95rem;
-}
-
-.sidebar-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 8px;
-}
-
-.sidebar-item {
-  background: transparent;
-  border: none;
-  padding: 10px;
-  border-radius: 10px;
-  cursor: pointer;
-  width: 48px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.sidebar-item:hover {
-  background: rgba(0, 71, 148, 0.06);
-}
-
-/* Topbar */
-.dashboard-main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
 }
 
 .dashboard-topbar {
-  height: 64px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;
+  background: var(--card);
   border-bottom: 1px solid rgba(0, 0, 0, 0.04);
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.85));
 }
 
-.topbar-right {
-  display: flex;
-  gap: 12px;
-  align-items: center;
+.dashboard-content {
+  background: var(--bg);
 }
 
-.icon-btn {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  font-size: 1.05rem;
-  padding: 8px;
-  border-radius: 8px;
+/* Botones y elementos interactivos */
+.sidebar-item.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.sidebar-item:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
 }
 
 .icon-btn:hover {
-  background: rgba(0, 0, 0, 0.04);
+  background: var(--accent-soft);
+  color: var(--accent);
 }
-
-.logout-btn {
-  background: transparent;
-  border: none;
-  color: #004794;
-  font-weight: 600;
-  padding: 6px 10px;
-  cursor: pointer;
-}
-
-.logout-btn:hover {
-  text-decoration: underline;
-}
-
-/* Content */
-.dashboard-content {
-  padding: 24px;
-  overflow: auto;
-}
-
-/* Forms */
-.reusable-form input,
-.reusable-form textarea,
-.reusable-form select {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #e3e8ee;
-  border-radius: 8px;
-  font-size: 0.95rem;
-}
-
-.reusable-form textarea {
-  min-height: 88px;
-  resize: vertical;
-}
-
-/* utility */
-.hide-on-collapsed {
-  display: none;
-}
-
-/* si quieres mostrar texto, cambia la width del sidebar */
-
 
 /* Animación */
 @keyframes fadeIn {
@@ -581,7 +517,6 @@ header.glass {
     transform: translateY(0);
   }
 }
-
 
 /* Responsive */
 @media (max-width: 768px) {

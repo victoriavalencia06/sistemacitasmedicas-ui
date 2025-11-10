@@ -8,11 +8,17 @@ import {
   FaCog,
   FaBell,
   FaClipboardList,
-  FaUsersCog // Nuevo icono para Roles
+  FaUsersCog
 } from "react-icons/fa";
 import { AuthContext } from "../../context/AuthContext";
 
-export default function Sidebar({ currentScreen, onNavigate, collapsed }) {
+export default function Sidebar({
+  currentScreen,
+  onNavigate,
+  collapsed,
+  isMobileOpen,
+  onCloseMobile
+}) {
   const { user } = useContext(AuthContext);
 
   // Mapeo de roles según tu API
@@ -32,10 +38,10 @@ export default function Sidebar({ currentScreen, onNavigate, collapsed }) {
       case "1": // Administrador
         return [
           { id: "dashboard", label: "Dashboard", icon: FaChartBar },
-          { id: "appointments", label: "Citas", icon: FaCalendar },
-          { id: "patients", label: "Pacientes", icon: FaUser },
+          { id: "citas", label: "Citas", icon: FaCalendar },
+          { id: "usuarios", label: "Usuarios", icon: FaUser },
           { id: "doctors", label: "Médicos", icon: FaUserMd },
-          { id: "roles", label: "Roles", icon: FaUsersCog }, // Nuevo item
+          { id: "roles", label: "Roles", icon: FaUsersCog },
           { id: "reports", label: "Reportes", icon: FaClipboardList },
           { id: "notifications", label: "Notificaciones", icon: FaBell }
         ];
@@ -69,11 +75,26 @@ export default function Sidebar({ currentScreen, onNavigate, collapsed }) {
 
   const menuItems = getMenuItems();
 
+  // Función para manejar clic en items
+  const handleItemClick = (screenId) => {
+    onNavigate(screenId);
+    // En móvil, cerrar sidebar después de navegar
+    if (window.innerWidth <= 768) {
+      onCloseMobile();
+    }
+  };
+
   return (
     <>
-      <div className={`dashboard-sidebar ${collapsed ? "collapsed" : ""}`}>
+      <div className={`
+        dashboard-sidebar 
+        ${collapsed ? "collapsed" : ""}
+        ${isMobileOpen ? "mobile-open" : ""}
+      `}>
         {/* Rol del usuario */}
-        {!collapsed && <div className="role-badge">{roleName}</div>}
+        {(!collapsed || isMobileOpen) && (
+          <div className="dashboard-badge">{roleName}</div>
+        )}
 
         {/* Navegación principal */}
         <nav className="sidebar-nav">
@@ -83,12 +104,14 @@ export default function Sidebar({ currentScreen, onNavigate, collapsed }) {
             return (
               <button
                 key={item.id}
-                onClick={() => onNavigate(item.id)}
+                onClick={() => handleItemClick(item.id)}
                 className={`sidebar-item ${isActive ? "active" : ""}`}
-                title={collapsed ? item.label : ""}
+                title={collapsed && !isMobileOpen ? item.label : ""}
               >
                 <Icon className="sidebar-icon" />
-                {!collapsed && <span className="sidebar-label">{item.label}</span>}
+                {(!collapsed || isMobileOpen) && (
+                  <span className="sidebar-label">{item.label}</span>
+                )}
               </button>
             );
           })}
@@ -96,15 +119,23 @@ export default function Sidebar({ currentScreen, onNavigate, collapsed }) {
 
         {/* Sección inferior */}
         <div className="sidebar-footer">
-          <button className="sidebar-item" title={collapsed ? "Configuración" : ""}>
+          <button
+            className="sidebar-item"
+            title={collapsed && !isMobileOpen ? "Configuración" : ""}
+          >
             <FaCog className="sidebar-icon" />
-            {!collapsed && <span className="sidebar-label">Configuración</span>}
+            {(!collapsed || isMobileOpen) && (
+              <span className="sidebar-label">Configuración</span>
+            )}
           </button>
         </div>
       </div>
 
-      {/* Overlay para móviles */}
-      {!collapsed && <div className="sidebar-overlay" />}
+      {/* Overlay para móviles - SOLO se muestra en móvil cuando está abierto */}
+      <div
+        className={`sidebar-overlay ${isMobileOpen ? "mobile-open" : ""}`}
+        onClick={onCloseMobile}
+      />
     </>
   );
 }

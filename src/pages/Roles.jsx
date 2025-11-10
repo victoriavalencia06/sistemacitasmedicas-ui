@@ -130,7 +130,7 @@ const Roles = () => {
     const handleCancel = () => {
         if (editingRol?.nombre) {
             Swal.fire({
-                title: '¿Estás seguro?',
+                title: '¿Estás seguro de salir?',
                 text: 'Los cambios no guardados se perderán',
                 icon: 'warning',
                 showCancelButton: true,
