@@ -3,17 +3,22 @@ import React from 'react';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
 const Pagination = ({ currentPage, totalPages, totalItems, itemsPerPage, onPageChange }) => {
+
     const getPageNumbers = () => {
         const pages = [];
-        const maxVisiblePages = 5;
-        let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+        const maxVisiblePages = 3; // Número de páginas visibles por bloque (puedes cambiarlo a 5)
 
-        if (endPage - startPage + 1 < maxVisiblePages) {
-            startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        // Determinar en qué bloque de páginas estamos
+        const currentBlock = Math.floor((currentPage - 1) / maxVisiblePages);
+
+        // Calcular las páginas que pertenecen a ese bloque
+        const startPage = currentBlock * maxVisiblePages + 1;
+        const endPage = Math.min(startPage + maxVisiblePages - 1, totalPages);
+
+        for (let i = startPage; i <= endPage; i++) {
+            pages.push(i);
         }
 
-        for (let i = startPage; i <= endPage; i++) pages.push(i);
         return pages;
     };
 
@@ -22,24 +27,46 @@ const Pagination = ({ currentPage, totalPages, totalItems, itemsPerPage, onPageC
 
     return (
         <div className="management-pagination">
-            <div className="pagination-info">Mostrando {startItem}-{endItem} de {totalItems}</div>
+            <div className="pagination-info">
+                Mostrando {startItem}-{endItem} de {totalItems}
+            </div>
 
             <nav aria-label="Page navigation">
                 <ul className="pagination justify-content-center">
+
+                    {/* Flecha izquierda */}
                     <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                        <button className="page-link" onClick={() => onPageChange(currentPage - 1)} disabled={currentPage === 1}>
+                        <button
+                            className="page-link"
+                            onClick={() => onPageChange(currentPage - 1)}
+                            disabled={currentPage === 1}
+                        >
                             <FaChevronLeft />
                         </button>
                     </li>
 
+                    {/* Números de página */}
                     {getPageNumbers().map(page => (
-                        <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
-                            <button className="page-link" onClick={() => onPageChange(page)}>{page}</button>
+                        <li
+                            key={page}
+                            className={`page-item ${currentPage === page ? 'active' : ''}`}
+                        >
+                            <button
+                                className="page-link"
+                                onClick={() => onPageChange(page)}
+                            >
+                                {page}
+                            </button>
                         </li>
                     ))}
 
+                    {/* Flecha derecha */}
                     <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                        <button className="page-link" onClick={() => onPageChange(currentPage + 1)} disabled={currentPage === totalPages}>
+                        <button
+                            className="page-link"
+                            onClick={() => onPageChange(currentPage + 1)}
+                            disabled={currentPage === totalPages}
+                        >
                             <FaChevronRight />
                         </button>
                     </li>

@@ -8,7 +8,8 @@ import {
   FaCog,
   FaBell,
   FaClipboardList,
-  FaUsersCog
+  FaUsersCog,
+  FaStethoscope
 } from "react-icons/fa";
 import { AuthContext } from "../../context/AuthContext";
 
@@ -42,6 +43,7 @@ export default function Sidebar({
           { id: "usuarios", label: "Usuarios", icon: FaUser },
           { id: "doctors", label: "Médicos", icon: FaUserMd },
           { id: "roles", label: "Roles", icon: FaUsersCog },
+          { id: "especializaciones", label: "Especializaciones", icon: FaStethoscope },
           { id: "reports", label: "Reportes", icon: FaClipboardList },
           { id: "notifications", label: "Notificaciones", icon: FaBell }
         ];

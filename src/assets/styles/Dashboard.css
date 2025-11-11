@@ -337,6 +337,344 @@ body {
     backdrop-filter: blur(2px);
 }
 
+/* ===== ESTILOS NUEVOS PARA EL DASHBOARD ===== */
+
+/* Welcome Card - Con tu paleta de colores */
+.welcome-card {
+    background: var(--card);
+    border: 1px solid var(--accent-soft);
+    border-radius: var(--radius);
+}
+
+.welcome-card .card-body {
+    padding: 1.5rem 2rem;
+}
+
+.welcome-avatar {
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--blue-soft);
+}
+
+.welcome-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.welcome-subtitle {
+    color: var(--text-secondary);
+    margin-bottom: 0;
+    font-size: 0.95rem;
+}
+
+.current-date {
+    background: var(--blue-soft);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--accent-soft);
+}
+
+.date-day {
+    font-size: 1.5rem !important;
+    color: var(--blue-primary);
+}
+
+.date-month {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+/* Stats Cards - Mismo tamaño y tu paleta */
+.stat-card {
+    transition: all 0.3s ease;
+    border-radius: var(--radius);
+    border: 1px solid var(--accent-soft);
+    height: 100%;
+    min-height: 140px;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1) !important;
+    border-color: var(--blue-light);
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    flex-shrink: 0;
+}
+
+/* Colores específicos para las tarjetas de estadísticas */
+.bg-blue-soft {
+    background-color: var(--blue-soft);
+}
+
+.bg-teal-soft {
+    background-color: rgba(0, 150, 136, 0.1);
+}
+
+.bg-blue-light-soft {
+    background-color: rgba(124, 197, 231, 0.1);
+}
+
+.bg-accent-soft {
+    background-color: var(--accent-soft);
+}
+
+.text-blue-primary {
+    color: var(--blue-primary);
+}
+
+.text-teal {
+    color: var(--teal);
+}
+
+.text-blue-light {
+    color: var(--blue-light);
+}
+
+.text-accent {
+    color: var(--accent);
+}
+
+.text-text-primary {
+    color: var(--text-primary);
+}
+
+.text-text-secondary {
+    color: var(--text-secondary);
+}
+
+/* Calendar - Ocupa todo el ancho */
+.calendar-section .card {
+    border-radius: var(--radius);
+    border: 1px solid var(--accent-soft);
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+}
+
+.calendar-day {
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 45px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    border: 1px solid transparent;
+    font-size: 0.9rem;
+}
+
+.calendar-day:hover {
+    background-color: var(--accent-soft);
+}
+
+.calendar-today {
+    background-color: var(--blue-soft);
+    color: var(--blue-primary);
+    font-weight: bold;
+    border-color: var(--blue-light);
+}
+
+.calendar-selected {
+    background-color: var(--blue-primary);
+    color: white;
+}
+
+.calendar-busy {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+    border-color: rgba(220, 53, 69, 0.3);
+}
+
+.busy-indicator {
+    width: 5px;
+    height: 5px;
+    background-color: #dc3545;
+    border-radius: 50%;
+    position: absolute;
+    bottom: 6px;
+}
+
+.legend-busy {
+    width: 14px;
+    height: 14px;
+    background-color: rgba(220, 53, 69, 0.1);
+    border: 1px solid #dc3545;
+    border-radius: 2px;
+}
+
+.legend-today {
+    width: 14px;
+    height: 14px;
+    background-color: var(--blue-soft);
+    border: 1px solid var(--blue-light);
+    border-radius: 2px;
+}
+
+.week-days {
+    font-weight: 600;
+    color: var(--text-secondary);
+    background-color: var(--accent-soft);
+    border-radius: 6px;
+    margin-bottom: 10px;
+}
+
+/* Charts Section - Ocupa todo el ancho */
+.charts-section .card {
+    border-radius: var(--radius);
+    border: 1px solid var(--accent-soft);
+}
+
+.chart-bars {
+    height: 140px;
+    padding: 0 15px;
+}
+
+.chart-bar-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: flex-end;
+}
+
+.chart-bar {
+    width: 35px;
+    border-radius: 4px 4px 0 0;
+    position: relative;
+    transition: all 0.3s ease;
+    min-height: 25px;
+    background: linear-gradient(to top, var(--blue-primary), var(--blue-light));
+}
+
+.chart-bar:hover {
+    opacity: 0.8;
+    transform: scale(1.05);
+}
+
+.chart-value {
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    background: var(--card);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--accent-soft);
+}
+
+.specialty-item {
+    padding: 0.6rem 0;
+}
+
+.specialty-name {
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+}
+
+.specialty-count {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--blue-primary);
+}
+
+.progress {
+    background-color: var(--accent-soft);
+    border-radius: 4px;
+    height: 10px;
+}
+
+.progress-bar {
+    background: linear-gradient(to right, var(--teal), var(--teal-dark));
+    border-radius: 4px;
+}
+
+/* Dashboard Content Wrapper */
+.dashboard-content-wrapper {
+    padding: 0;
+}
+
+/* Responsive para componentes del dashboard */
+@media (max-width: 1200px) {
+    .welcome-card .card-body {
+        padding: 1.25rem 1.5rem;
+    }
+    
+    .welcome-avatar {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .welcome-title {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .welcome-card .card-body {
+        padding: 1rem;
+    }
+    
+    .welcome-avatar {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .welcome-title {
+        font-size: 1.1rem;
+    }
+    
+    .calendar-day {
+        min-height: 40px;
+        font-size: 0.8rem;
+    }
+    
+    .chart-bars {
+        height: 120px;
+    }
+    
+    .chart-bar {
+        width: 25px;
+    }
+    
+    .stat-card {
+        min-height: 120px;
+    }
+    
+    .stat-icon {
+        width: 45px;
+        height: 45px;
+    }
+}
+
+/* Asegurar que todas las cards tengan la misma altura en móvil */
+@media (max-width: 576px) {
+    .col-sm-12 .stat-card {
+        min-height: 110px;
+    }
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .dashboard-topbar {

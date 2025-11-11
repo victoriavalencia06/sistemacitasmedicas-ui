@@ -1,24 +1,56 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import Topbar from '../components/dashboard/Topbar';
 import Sidebar from '../components/dashboard/Sidebar';
 import '../assets/styles/Dashboard.css';
+
+// Componentes del Dashboard
+import WelcomeCard from '../components/dashboard/WelcomeCard';
+import StatsCards from '../components/dashboard/StatsCards';
+import CalendarSection from '../components/dashboard/CalendarSection';
+import ChartsSection from '../components/dashboard/ChartsSection';
+
+// Páginas del sistema
 import Roles from '../pages/Roles';
-import Citas from '../pages/Citas';
-import Usuarios from '../pages/Usuarios';
+import Especializaciones from '../pages/Especializaciones';
+// import Citas from '../pages/Citas';
+// import Usuarios from '../pages/Usuarios';
 
 function Dashboard() {
     const [currentScreen, setCurrentScreen] = React.useState('dashboard');
     const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+    const [stats, setStats] = useState({
+        totalPatients: 0,
+        todayAppointments: 0,
+        availableSlots: 0,
+        consultationsThisMonth: 0
+    });
 
     const { user, logout } = useContext(AuthContext);
     const userName = user?.nombre || "Usuario";
 
+    useEffect(() => {
+        if (currentScreen === 'dashboard') {
+            loadDashboardData();
+        }
+    }, [currentScreen]);
+
+    const loadDashboardData = async () => {
+        // Simulación de carga de datos del dashboard
+        setTimeout(() => {
+            setStats({
+                totalPatients: 156,
+                todayAppointments: 8,
+                availableSlots: 12,
+                consultationsThisMonth: 45
+            });
+        }, 1000);
+    };
+
     const handleNavigate = (screen) => {
-        console.log('🔄 Navegando a:', screen); // Para debug
+        console.log('🔄 Navegando a:', screen);
         setCurrentScreen(screen);
-        // En móviles, cerrar el menú después de navegar
         if (window.innerWidth <= 768) {
             setMobileMenuOpen(false);
         }
@@ -36,27 +68,48 @@ function Dashboard() {
         }
     };
 
-    // Función para cerrar el sidebar en móvil
     const closeMobileSidebar = () => {
         if (window.innerWidth <= 768) {
             setMobileMenuOpen(false);
         }
     };
 
-    // Determinar si el sidebar debe mostrarse como colapsado
     const isSidebarCollapsed = window.innerWidth <= 768 ? !mobileMenuOpen : sidebarCollapsed;
 
-    // Renderizar el contenido según la pantalla actual
     const renderContent = () => {
-        console.log('🎯 Pantalla actual:', currentScreen); // Para debug
+        console.log('🎯 Pantalla actual:', currentScreen);
 
         switch (currentScreen) {
             case 'dashboard':
                 return (
-                    <div>
-                        <h1>Bienvenido al Dashboard</h1>
-                        <p>Hola, {userName}!</p>
-                        {/* Aquí puedes agregar más contenido del dashboard */}
+                    <div className="dashboard-content-wrapper">
+                        {/* Sección 1: Tarjeta de Bienvenida */}
+                        <div className="row mb-4">
+                            <div className="col-12">
+                                <WelcomeCard user={user} />
+                            </div>
+                        </div>
+
+                        {/* Sección 2: Tarjetas de Estadísticas - TODAS EN UNA FILA */}
+                        <div className="row mb-4">
+                            <div className="col-12">
+                                <StatsCards stats={stats} />
+                            </div>
+                        </div>
+
+                        {/* Sección 3: Calendario (OCUPA TODO EL ANCHO) */}
+                        <div className="row mb-4">
+                            <div className="col-12">
+                                <CalendarSection />
+                            </div>
+                        </div>
+
+                        {/* Sección 4: Gráficas (OCUPA TODO EL ANCHO) */}
+                        <div className="row">
+                            <div className="col-12">
+                                <ChartsSection stats={stats} />
+                            </div>
+                        </div>
                     </div>
                 );
             case 'appointments':
@@ -67,6 +120,8 @@ function Dashboard() {
                 return <div><h1>Pacientes</h1><p>Gestión de pacientes</p></div>;
             case 'roles':
                 return <Roles />;
+            case 'especializaciones':
+                return <Especializaciones />;
             case 'reports':
                 return <div><h1>Reportes</h1><p>Reportes del sistema</p></div>;
             case 'notifications':
@@ -87,7 +142,7 @@ function Dashboard() {
     return (
         <div className={`dashboard-root ${isSidebarCollapsed ? "sidebar-collapsed" : ""} ${mobileMenuOpen ? "mobile-menu-open" : ""}`}>
             <Sidebar
-                userType={user?.role} // Usar el rol del usuario autenticado
+                userType={user?.role}
                 currentScreen={currentScreen}
                 onNavigate={handleNavigate}
                 collapsed={isSidebarCollapsed}
