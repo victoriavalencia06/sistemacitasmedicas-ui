@@ -13,6 +13,7 @@ import ChartsSection from '../components/dashboard/ChartsSection';
 // Páginas del sistema
 import Roles from '../pages/Roles';
 import Especializaciones from '../pages/Especializaciones';
+import Pacientes from '../pages/Pacientes';
 // import Citas from '../pages/Citas';
 // import Usuarios from '../pages/Usuarios';
 
@@ -130,6 +131,8 @@ function Dashboard() {
                 return <Citas />;
             case 'usuarios':
                 return <Usuarios />;
+            case 'pacientes':
+                return <Pacientes />;
             default:
                 return (
                     <div>

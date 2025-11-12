@@ -41,6 +41,7 @@ export default function Sidebar({
           { id: "dashboard", label: "Dashboard", icon: FaChartBar },
           { id: "citas", label: "Citas", icon: FaCalendar },
           { id: "usuarios", label: "Usuarios", icon: FaUser },
+          { id: "pacientes", label: "Pacientes", icon: FaUser },
           { id: "doctors", label: "Médicos", icon: FaUserMd },
           { id: "roles", label: "Roles", icon: FaUsersCog },
           { id: "especializaciones", label: "Especializaciones", icon: FaStethoscope },
