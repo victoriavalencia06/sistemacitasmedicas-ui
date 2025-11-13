@@ -14,8 +14,9 @@ import ChartsSection from '../components/dashboard/ChartsSection';
 import Roles from '../pages/Roles';
 import Especializaciones from '../pages/Especializaciones';
 import Pacientes from '../pages/Pacientes';
-// import Citas from '../pages/Citas';
-// import Usuarios from '../pages/Usuarios';
+import Citas from '../pages/Citas';
+import Usuarios from '../pages/Usuarios';
+import Doctor from '../pages/Doctor'
 
 function Dashboard() {
     const [currentScreen, setCurrentScreen] = React.useState('dashboard');
@@ -119,6 +120,8 @@ function Dashboard() {
                 return <div><h1>Médicos</h1><p>Gestión de médicos</p></div>;
             case 'patients':
                 return <div><h1>Pacientes</h1><p>Gestión de pacientes</p></div>;
+            case 'doctor':
+                return <Doctor />;
             case 'roles':
                 return <Roles />;
             case 'especializaciones':

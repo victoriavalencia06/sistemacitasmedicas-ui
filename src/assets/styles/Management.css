@@ -38,6 +38,10 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .btn-management:hover {
@@ -63,6 +67,13 @@
 
 .btn-management-danger:hover {
     background-color: #c82333;
+}
+
+/* Botones pequeños */
+.btn-management.btn-sm {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    white-space: nowrap;
 }
 
 /* Tarjetas de gestión */
@@ -329,7 +340,8 @@
     margin-top: 8px;
     padding: 10px 12px;
     border-radius: 8px;
-    background-color: #fff4e5; /* fondo suave tipo warning */
+    background-color: #fff4e5;
+    /* fondo suave tipo warning */
     color: #7a4b00;
     font-size: 0.9rem;
     border: 1px solid rgba(239, 148, 6, 0.12);
@@ -379,11 +391,11 @@
     border-radius: 50%;
 }
 
-input:checked + .slider {
+input:checked+.slider {
     background-color: #004794;
 }
 
-input:checked + .slider:before {
+input:checked+.slider:before {
     transform: translateX(24px);
 }
 
@@ -525,7 +537,155 @@ input:checked + .slider:before {
     border: 1px solid #ccc;
 }
 
-/* Responsive */
+/* === ESTILOS PARA DETALLES DE DOCTOR === */
+.detail-section {
+    background: #f8fafc;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid #e8f0fe;
+}
+
+.detail-section-title {
+    color: #3a6670;
+    font-weight: 600;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    margin-bottom: 0 !important;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-top: 12px;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e8f0fe;
+}
+
+.detail-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.detail-item label {
+    font-weight: 600;
+    color: #3a6670;
+    min-width: 160px;
+    display: flex;
+    align-items: center;
+}
+
+.detail-value {
+    color: #5f6368;
+    text-align: right;
+    flex: 1;
+}
+
+/* Header de sección con botón */
+.detail-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    gap: 1rem;
+}
+
+/* === ESTILOS PARA ESPECIALIZACIONES EN DETALLES DE DOCTOR === */
+.specializations-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.specialization-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: white;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    min-height: 60px;
+}
+
+.specialization-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+    border-color: #004794;
+}
+
+.specialization-content {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.specialization-name {
+    font-weight: 600;
+    color: #3a6670;
+    margin-bottom: 0;
+    font-size: 0.95rem;
+    word-break: break-word;
+}
+
+.btn-remove-especializacion {
+    background: none;
+    border: none;
+    color: #dc3545;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+}
+
+.btn-remove-especializacion:hover {
+    background-color: rgba(220, 53, 69, 0.1);
+}
+
+/* Mejoras para el modal de SweetAlert2 con selects */
+.swal2-input {
+    border: 1px solid #e0e0e0 !important;
+    border-radius: 8px !important;
+    padding: 12px 15px !important;
+    font-size: 0.95rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.swal2-input:focus {
+    outline: none !important;
+    border-color: #004794 !important;
+    box-shadow: 0 0 0 3px rgba(0, 71, 148, 0.1) !important;
+}
+
+/* Select dentro de SweetAlert2 */
+.swal2-input select {
+    width: 100% !important;
+    padding: 12px 15px !important;
+    border: 1px solid #e0e0e0 !important;
+    border-radius: 8px !important;
+    font-size: 0.95rem !important;
+    background-color: white !important;
+}
+
+.swal2-input select:focus {
+    outline: none !important;
+    border-color: #004794 !important;
+    box-shadow: 0 0 0 3px rgba(0, 71, 148, 0.1) !important;
+}
+
+/* Tablet y móviles grandes (768px y menos) */
 @media (max-width: 768px) {
     .management-container {
         padding: 15px;
@@ -547,6 +707,12 @@ input:checked + .slider:before {
 
     .form-actions {
         flex-direction: column;
+        gap: 10px;
+    }
+
+    .form-actions .btn-management {
+        width: 100%;
+        justify-content: center;
     }
 
     .btn-management {
@@ -568,15 +734,117 @@ input:checked + .slider:before {
     .pagination {
         flex-wrap: wrap;
     }
+
+    /* Formularios y detalles */
+    .management-form-header {
+        padding: 15px 20px !important;
+    }
+
+    .management-form-header .d-flex {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+        width: 100%;
+    }
+
+    .management-form-header .btn-management-secondary {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        padding: 6px 10px !important;
+        width: auto;
+        min-width: auto;
+    }
+
+    .management-form-title {
+        font-size: 1.3rem;
+        padding-right: 50px;
+        width: 100%;
+    }
+
+    .management-form-subtitle {
+        font-size: 0.85rem;
+        padding-right: 50px;
+        width: 100%;
+    }
+
+    /* Detalles responsivos */
+    .detail-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+
+    .detail-item label {
+        min-width: auto;
+        margin-bottom: 0;
+        font-size: 0.9rem;
+    }
+
+    .detail-value {
+        text-align: left;
+        width: 100%;
+        font-size: 0.95rem;
+    }
+
+    .detail-section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .detail-section-header .btn-management {
+        width: 100%;
+        justify-content: center;
+        font-size: 0.8rem;
+        padding: 8px 12px;
+    }
+
+    /* Especializaciones */
+    .specializations-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .specialization-card {
+        padding: 0.75rem;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+    }
+
+    .specialization-content {
+        margin-right: 0;
+        text-align: center;
+    }
+
+    .btn-remove-especializacion {
+        align-self: center;
+        width: 36px;
+        height: 36px;
+    }
+
+    .specializations-list {
+        justify-content: flex-start;
+    }
 }
 
+/* Móviles pequeños (480px y menos) */
 @media (max-width: 480px) {
+    .management-container {
+        padding: 10px;
+    }
+
+    .management-form-container {
+        margin: 0 -10px;
+    }
+
     .management-card {
         padding: 20px 15px;
     }
 
     .management-form {
-        padding: 20px 15px;
+        padding: 15px;
     }
 
     .management-table-header,
@@ -584,8 +852,35 @@ input:checked + .slider:before {
         padding: 15px 20px;
     }
 
+    .management-form-header {
+        padding: 12px 15px !important;
+    }
+
+    .management-form-header .btn-management-secondary {
+        top: 12px;
+        right: 12px;
+        padding: 5px 8px !important;
+    }
+
+    .management-form-title {
+        font-size: 1.2rem;
+        padding-right: 45px;
+    }
+
     .management-table th,
     .management-table td {
         padding: 10px 15px;
+    }
+
+    .detail-section {
+        padding: 15px;
+    }
+
+    .specialization-card {
+        padding: 0.6rem;
+    }
+
+    .specialization-name {
+        font-size: 0.9rem;
     }
 }
