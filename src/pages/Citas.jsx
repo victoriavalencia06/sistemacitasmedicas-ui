@@ -98,12 +98,17 @@ const Citas = () => {
 
             console.log('📥 Datos crudos de la API:', rawList);
 
-            // Mapeo CORREGIDO
+            // Mapeo MEJORADO para guardar más información
             const mapped = rawList.map((c) => ({
                 id: c.idCita,
                 idCita: c.idCita,
                 pacienteNombre: c.paciente || 'Sin paciente',
                 doctorNombre: c.doctor || 'Sin doctor',
+                // Guardar información adicional para edición
+                usuarioNombre: c.usuario || '', // Si está disponible
+                idUsuario: c.idUsuario, // Si está disponible
+                idPaciente: c.idPaciente, // Si está disponible  
+                idDoctor: c.idDoctor, // Si está disponible
                 fechaHora: c.fechaHora ? new Date(c.fechaHora).toLocaleString() : 'Sin fecha',
                 fechaHoraOriginal: c.fechaHora, // Guardar para edición
                 estado: c.estado,
@@ -130,30 +135,98 @@ const Citas = () => {
     const handleEdit = async (cita) => {
         try {
             console.log('✏️ Preparando cita para editar ID:', cita.idCita);
-            
-            // Buscar los datos actuales de la cita
-            const usuarioActual = usuarios.find(u => u.nombre === cita.usuarioNombre) || {};
-            const pacienteActual = pacientes.find(p => p.nombre === cita.pacienteNombre) || {};
-            const doctorActual = doctores.find(d => d.nombre === cita.doctorNombre) || {};
+            console.log('📋 Datos de la cita recibida:', cita);
+            console.log('👥 Datos disponibles:', {
+                usuarios: usuarios.length,
+                pacientes: pacientes.length, 
+                doctores: doctores.length
+            });
+
+            // 🔍 Estrategia 1: Buscar por ID directo si está disponible
+            let usuarioId = '';
+            let pacienteId = '';
+            let doctorId = '';
+
+            // Si la cita ya tiene IDs, usarlos directamente
+            if (cita.idUsuario) {
+                usuarioId = cita.idUsuario.toString();
+            } else {
+                // Buscar por nombre en usuarios
+                const usuarioEncontrado = usuarios.find(u => 
+                    u.nombre && cita.usuarioNombre && 
+                    u.nombre.toLowerCase().includes(cita.usuarioNombre.toLowerCase().split(' ')[0])
+                );
+                usuarioId = usuarioEncontrado?.idUsuario?.toString() || '';
+            }
+
+            if (cita.idPaciente) {
+                pacienteId = cita.idPaciente.toString();
+            } else {
+                // Buscar por nombre en pacientes
+                const pacienteEncontrado = pacientes.find(p => 
+                    p.nombre && cita.pacienteNombre && 
+                    p.nombre.toLowerCase().includes(cita.pacienteNombre.toLowerCase().split(' ')[0])
+                );
+                pacienteId = pacienteEncontrado?.idPaciente?.toString() || '';
+            }
+
+            if (cita.idDoctor) {
+                doctorId = cita.idDoctor.toString();
+            } else {
+                // Buscar por nombre en doctores
+                const doctorEncontrado = doctores.find(d => 
+                    d.nombre && cita.doctorNombre && 
+                    d.nombre.toLowerCase().includes(cita.doctorNombre.toLowerCase().split(' ')[0])
+                );
+                doctorId = doctorEncontrado?.idDoctor?.toString() || '';
+            }
+
+            console.log('🎯 IDs encontrados:', { usuarioId, pacienteId, doctorId });
 
             const citaParaEditar = {
                 id: cita.idCita,
                 idCita: cita.idCita,
-                idUsuario: usuarioActual.idUsuario || '',
-                idPaciente: pacienteActual.idPaciente || '',
-                idDoctor: doctorActual.idDoctor || '',
-                fechaHora: cita.fechaHoraOriginal ? cita.fechaHoraOriginal.substring(0, 16) : '',
-                fechaHoraOriginal: cita.fechaHoraOriginal,
+                idUsuario: usuarioId,
+                idPaciente: pacienteId,
+                idDoctor: doctorId,
+                fechaHora: cita.fechaHoraOriginal ? 
+                    new Date(cita.fechaHoraOriginal).toISOString().slice(0, 16) : 
+                    (cita.fechaHora ? new Date(cita.fechaHora).toISOString().slice(0, 16) : ''),
+                fechaHoraOriginal: cita.fechaHoraOriginal || cita.fechaHora,
                 estado: cita.estado
             };
 
-            console.log('🎯 Cita preparada para edición:', citaParaEditar);
+            console.log('✅ Cita preparada para edición:', citaParaEditar);
             setEditingCita(citaParaEditar);
             setShowForm(true);
             
         } catch (err) {
             console.error('❌ Error al preparar cita para editar:', err);
-            Swal.fire('Error', 'No se pudo cargar la cita para editar', 'error');
+            
+            // 🔄 Último fallback: Dejar los campos vacíos pero mostrar la cita
+            const citaParaEditar = {
+                id: cita.idCita,
+                idCita: cita.idCita,
+                idUsuario: '',
+                idPaciente: '',
+                idDoctor: '',
+                fechaHora: cita.fechaHoraOriginal ? 
+                    new Date(cita.fechaHoraOriginal).toISOString().slice(0, 16) : 
+                    (cita.fechaHora ? new Date(cita.fechaHora).toISOString().slice(0, 16) : ''),
+                fechaHoraOriginal: cita.fechaHoraOriginal || cita.fechaHora,
+                estado: cita.estado
+            };
+
+            console.log('⚠️ Cita preparada con campos vacíos:', citaParaEditar);
+            setEditingCita(citaParaEditar);
+            setShowForm(true);
+            
+            Swal.fire({
+                icon: 'warning',
+                title: 'Información incompleta',
+                text: 'Algunos campos no pudieron cargarse automáticamente. Por favor, seleccione manualmente.',
+                timer: 3000
+            });
         }
     };
 

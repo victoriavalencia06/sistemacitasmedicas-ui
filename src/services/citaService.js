@@ -91,20 +91,20 @@ const citaService = {
             console.log('🎯 Service CREATE llamado con:', citaData);
             
             // Validar que todos los campos requeridos estén presentes
-            if (!citaData.idUsuario || !citaData.idPaciente || !citaData.idDoctor) {
-                throw new Error('Todos los campos son requeridos (Usuario, Paciente, Doctor)');
+            if (!citaData.idUsuario || !citaData.idPaciente || !citaData.idDoctor || !citaData.fechaHora) {
+                throw new Error('Todos los campos son requeridos (Usuario, Paciente, Doctor, Fecha y Hora)');
             }
 
-            // Usar fecha y hora actual
-            const fechaHoraActual = new Date().toISOString();
-            console.log('🕐 Usando fecha/hora actual:', fechaHoraActual);
+            // ✅ CORREGIDO: Usar la fecha seleccionada por el usuario
+            const fechaHoraSeleccionada = new Date(citaData.fechaHora).toISOString();
+            console.log('🕐 Usando fecha/hora seleccionada:', fechaHoraSeleccionada);
 
             // PAYLOAD CORREGIDO
             const payload = {
                 idUsuario: parseInt(citaData.idUsuario),
                 idPaciente: parseInt(citaData.idPaciente),
                 idDoctor: parseInt(citaData.idDoctor),
-                fechaHora: fechaHoraActual, // Siempre fecha actual
+                fechaHora: fechaHoraSeleccionada, // ← AHORA usa la fecha del usuario
                 estado: citaData.estado ? 1 : 0
             };
 
@@ -159,8 +159,12 @@ const citaService = {
         try {
             console.log(`🎯 Service UPDATE llamado para ID: ${id}`, citaData);
             
-            // Para update, mantener la fecha original o usar la actual según necesites
-            const fechaHora = citaData.fechaHoraOriginal || new Date().toISOString();
+            // ✅ CORREGIDO: Usar la fecha seleccionada por el usuario
+            if (!citaData.fechaHora) {
+                throw new Error('La fecha y hora son requeridas');
+            }
+            
+            const fechaHoraSeleccionada = new Date(citaData.fechaHora).toISOString();
 
             // PAYLOAD para update
             const payload = {
@@ -168,7 +172,7 @@ const citaService = {
                 idUsuario: parseInt(citaData.idUsuario),
                 idPaciente: parseInt(citaData.idPaciente),
                 idDoctor: parseInt(citaData.idDoctor),
-                fechaHora: fechaHora,
+                fechaHora: fechaHoraSeleccionada, // ← AHORA usa la fecha del usuario
                 estado: citaData.estado ? 1 : 0
             };
 

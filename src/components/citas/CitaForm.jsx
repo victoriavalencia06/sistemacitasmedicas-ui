@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { FaCalendarAlt, FaSave, FaPlus, FaTimes, FaExclamationCircle, FaInfoCircle } from 'react-icons/fa';
+import { FaCalendarAlt, FaSave, FaPlus, FaTimes, FaExclamationCircle, FaInfoCircle, FaClock } from 'react-icons/fa';
 
 const CitaForm = ({ cita, onSubmit, onCancel, usuarios, doctores, pacientes }) => {
     const [formData, setFormData] = useState({
         idUsuario: '',
         idPaciente: '',
         idDoctor: '',
+        fechaHora: '', // Nuevo campo para fecha y hora
         estado: true
     });
     const [errors, setErrors] = useState({});
@@ -14,18 +15,32 @@ const CitaForm = ({ cita, onSubmit, onCancel, usuarios, doctores, pacientes }) =
     useEffect(() => {
         if (cita) {
             console.log('📋 Cita recibida para editar:', cita);
+            
+            // Formatear la fecha para el input datetime-local
+            const formatDateForInput = (dateString) => {
+                if (!dateString) return '';
+                const date = new Date(dateString);
+                return date.toISOString().slice(0, 16);
+            };
+
             setFormData({
                 idUsuario: cita.idUsuario?.toString() || '',
                 idPaciente: cita.idPaciente?.toString() || '',
                 idDoctor: cita.idDoctor?.toString() || '',
+                fechaHora: formatDateForInput(cita.fechaHora), // Usar la fecha de la cita
                 estado: cita.estado ?? true
             });
         } else {
             console.log('🆕 Creando nueva cita - formulario vacío');
+            // Establecer fecha y hora actual por defecto
+            const now = new Date();
+            const defaultDateTime = now.toISOString().slice(0, 16);
+            
             setFormData({
                 idUsuario: '',
                 idPaciente: '',
                 idDoctor: '',
+                fechaHora: defaultDateTime, // Fecha y hora actual por defecto
                 estado: true
             });
         }
@@ -58,6 +73,19 @@ const CitaForm = ({ cita, onSubmit, onCancel, usuarios, doctores, pacientes }) =
             newErrors.idDoctor = 'Debe seleccionar un doctor';
         }
         
+        // Validar fecha y hora
+        if (!formData.fechaHora) {
+            newErrors.fechaHora = 'Debe seleccionar fecha y hora';
+        } else {
+            const selectedDate = new Date(formData.fechaHora);
+            const now = new Date();
+            
+            // Validar que la fecha no sea en el pasado
+            if (selectedDate < now) {
+                newErrors.fechaHora = 'No puede seleccionar una fecha y hora pasadas';
+            }
+        }
+        
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -75,10 +103,11 @@ const CitaForm = ({ cita, onSubmit, onCancel, usuarios, doctores, pacientes }) =
             idUsuario: formData.idUsuario,
             idPaciente: formData.idPaciente,
             idDoctor: formData.idDoctor,
+            fechaHora: formData.fechaHora, // Incluir la fecha seleccionada
             estado: formData.estado
         };
 
-        // Si estamos editando, incluir la fecha original
+        // Si estamos editando, incluir la fecha original si es necesario
         if (cita && cita.fechaHoraOriginal) {
             payload.fechaHoraOriginal = cita.fechaHoraOriginal;
         }
@@ -101,7 +130,7 @@ const CitaForm = ({ cita, onSubmit, onCancel, usuarios, doctores, pacientes }) =
                 
                 <div className="info-alert">
                     <FaInfoCircle style={{ marginRight: 8, color: '#1890ff' }} />
-                    <strong>Nota:</strong> La fecha y hora se establecerán automáticamente a la hora actual del sistema.
+                    <strong>Nota:</strong> Seleccione la fecha y hora deseada para la cita.
                 </div>
             </div>
 
@@ -178,6 +207,32 @@ const CitaForm = ({ cita, onSubmit, onCancel, usuarios, doctores, pacientes }) =
                             </div>
                         )}
                     </div>
+                </div>
+
+                {/* NUEVO CAMPO PARA FECHA Y HORA */}
+                <div className="form-group">
+                    <label htmlFor="fechaHora" className="form-label required">
+                        <FaClock style={{ marginRight: 6 }} />
+                        Fecha y Hora de la Cita
+                    </label>
+                    <input
+                        type="datetime-local"
+                        id="fechaHora"
+                        name="fechaHora"
+                        value={formData.fechaHora}
+                        onChange={handleChange}
+                        className={`form-control ${errors.fechaHora ? 'error' : ''}`}
+                        min={new Date().toISOString().slice(0, 16)} // No permitir fechas pasadas
+                    />
+                    {errors.fechaHora && (
+                        <div className="form-error">
+                            <FaExclamationCircle style={{ marginRight: 6 }} />
+                            {errors.fechaHora}
+                        </div>
+                    )}
+                    <small className="text-muted">
+                        Seleccione la fecha y hora deseada para la cita. No se permiten fechas pasadas.
+                    </small>
                 </div>
 
                 <div className="form-group">
