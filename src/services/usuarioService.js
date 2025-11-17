@@ -40,116 +40,111 @@ const usuarioService = {
         }
     },
 
-    // Crear nuevo usuario - datos: { IdRol: number, Nombre: string, Correo: string, Password: string, Estado: number }
-create: async (usuarioData) => {
-    console.log('🎯 Service CREATE llamado con:', usuarioData);
-    try {
-        const dataToSend = {
-            IdRol: usuarioData.IdRol,
-            Nombre: usuarioData.Nombre,
-            Correo: usuarioData.Correo,
-            Estado: usuarioData.Estado ?? 1,
-            PasswordHash: usuarioData.Password
-        };
+    // Crear nuevo usuario - CORREGIDO: enviar ambos campos
+    create: async (usuarioData) => {
+        console.log('🎯 Service CREATE llamado con:', usuarioData);
+        try {
+            const dataToSend = {
+                IdRol: usuarioData.IdRol,
+                Nombre: usuarioData.Nombre,
+                Correo: usuarioData.Correo,
+                Estado: usuarioData.Estado ?? 1,
+                Password: usuarioData.Password, // Para que el servicio lo encripte
+                PasswordHash: usuarioData.Password // Temporal - el backend lo reemplazará
+            };
 
-        console.log('📤 Enviando a API:', JSON.stringify(dataToSend, null, 2));
-        
-        const response = await api.post('/usuario/create', dataToSend, {
-            headers: { 'Content-Type': 'application/json' }
-        });
-        
-        console.log('✅ Respuesta de API:', response.data);
-        console.log('✅ Status:', response.status);
+            console.log('📤 Enviando a API:', JSON.stringify(dataToSend, null, 2));
+            
+            const response = await api.post('/usuario/create', dataToSend, {
+                headers: { 'Content-Type': 'application/json' }
+            });
+            
+            console.log('✅ Respuesta de API:', response.data);
+            console.log('✅ Status:', response.status);
 
-        await Swal.fire({
-            icon: 'success',
-            title: '¡Éxito!',
-            text: 'Usuario creado correctamente',
-            timer: 1400,
-            showConfirmButton: false
-        });
+            await Swal.fire({
+                icon: 'success',
+                title: '¡Éxito!',
+                text: 'Usuario creado correctamente',
+                timer: 1400,
+                showConfirmButton: false
+            });
 
-        return response.data;
-    } catch (error) {
-        console.error('❌ Error completo:', error);
-        console.error('❌ Response data:', error.response?.data);
-        console.error('❌ Response status:', error.response?.status);
-        console.error('❌ Response headers:', error.response?.headers);
-        
-        const apiData = error.response?.data;
-        console.error('❌ API Data completo:', apiData);
-        
-        const msgs = extractValidationMessages(apiData);
-        console.error('❌ Mensajes extraídos:', msgs);
-        
-        const display = msgs.length
-            ? msgs.join('\n')
-            : (apiData?.message || 'Error al crear el usuario');
+            return response.data;
+        } catch (error) {
+            console.error('❌ Error completo:', error);
+            console.error('❌ Response data:', error.response?.data);
+            console.error('❌ Response status:', error.response?.status);
+            
+            const apiData = error.response?.data;
+            const msgs = extractValidationMessages(apiData);
+            const display = msgs.length
+                ? msgs.join('\n')
+                : (apiData?.message || 'Error al crear el usuario');
 
-        console.error('❌ Mensaje final para mostrar:', display);
+            await Swal.fire({
+                icon: 'error',
+                title: 'Error al crear usuario',
+                text: display
+            });
 
-        await Swal.fire({
-            icon: 'error',
-            title: 'Error al crear usuario',
-            text: display
-        });
-
-        throw apiData || new Error(display);
-    }
-},
-
-    // Actualizar usuario - datos: { IdRol: number, Nombre: string, Correo: string, Estado: number }
-update: async (id, usuarioData) => {
-    console.log('🎯 Service UPDATE llamado con ID:', id, 'Data:', usuarioData);
-    try {
-        const payload = {
-            IdUsuario: Number(id),
-            IdRol: usuarioData.IdRol,
-            Nombre: usuarioData.Nombre,
-            Correo: usuarioData.Correo,
-            Estado: usuarioData.Estado,
-            PasswordHash: usuarioData.Password || 'temp_password_123' // ← VALOR POR DEFECTO
-        };
-
-        console.log('📤 Payload COMPLETO para UPDATE:', JSON.stringify(payload, null, 2));
-
-        const response = await api.put(`/usuario/update/${id}`, payload, {
-            headers: { 'Content-Type': 'application/json' }
-        });
-
-        console.log('✅ Respuesta de UPDATE:', response.data);
-
-        await Swal.fire({
-            icon: 'success',
-            title: '¡Actualizado!',
-            text: 'Usuario actualizado correctamente',
-            timer: 1200,
-            showConfirmButton: false
-        });
-
-        return response.data;
-    } catch (error) {
-        console.error('❌ Error completo en UPDATE:', error);
-        console.error('❌ Response data:', error.response?.data);
-        console.error('❌ Response status:', error.response?.status);
-        
-        if (error.response?.data) {
-            console.error('❌ Error details:', JSON.stringify(error.response.data, null, 2));
+            throw apiData || new Error(display);
         }
-        
-        const apiData = error.response?.data;
-        const msgs = extractValidationMessages(apiData);
-        const display = msgs.length ? msgs.join('\n') : (apiData?.message || 'Error al actualizar el usuario');
+    },
 
-        await Swal.fire({
-            icon: 'error',
-            title: 'Error al actualizar usuario',
-            text: display
-        });
+    // Actualizar usuario - CORREGIDO: enviar ambos campos si hay password
+    update: async (id, usuarioData) => {
+        console.log('🎯 Service UPDATE llamado con ID:', id, 'Data:', usuarioData);
+        try {
+            const payload = {
+                IdRol: usuarioData.IdRol,
+                Nombre: usuarioData.Nombre,
+                Correo: usuarioData.Correo,
+                Estado: usuarioData.Estado
+            };
 
-        throw apiData || new Error(display);
-    }
-},
+            // Solo incluir Password y PasswordHash si se proporcionó una nueva contraseña
+            if (usuarioData.Password && usuarioData.Password.trim()) {
+                payload.Password = usuarioData.Password;
+                payload.PasswordHash = usuarioData.Password; // Temporal
+            }
+
+            console.log('📤 Payload COMPLETO para UPDATE:', JSON.stringify(payload, null, 2));
+
+            const response = await api.put(`/usuario/update/${id}`, payload, {
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            console.log('✅ Respuesta de UPDATE:', response.data);
+
+            await Swal.fire({
+                icon: 'success',
+                title: '¡Actualizado!',
+                text: 'Usuario actualizado correctamente',
+                timer: 1200,
+                showConfirmButton: false
+            });
+
+            return response.data;
+        } catch (error) {
+            console.error('❌ Error completo en UPDATE:', error);
+            console.error('❌ Response data:', error.response?.data);
+            console.error('❌ Response status:', error.response?.status);
+            
+            const apiData = error.response?.data;
+            const msgs = extractValidationMessages(apiData);
+            const display = msgs.length ? msgs.join('\n') : (apiData?.message || 'Error al actualizar el usuario');
+
+            await Swal.fire({
+                icon: 'error',
+                title: 'Error al actualizar usuario',
+                text: display
+            });
+
+            throw apiData || new Error(display);
+        }
+    },
+
     // Eliminar usuario
     delete: async (id) => {
         try {

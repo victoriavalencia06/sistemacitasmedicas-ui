@@ -70,8 +70,8 @@ const Usuarios = () => {
             const data = await usuarioService.getAll();
             const rawList = Array.isArray(data) ? data : (data.items || []);
 
-            // SOLO PROCESAR USUARIOS ACTIVOS 
-            const usuariosActivos = rawList.map((u, index) => {
+            // PROCESAR TODOS LOS USUARIOS (activos e inactivos)
+            const usuariosProcesados = rawList.map((u, index) => {
                 const resolvedId = u.idUsuario ?? u.idusuario ?? u.IdUsuario ?? u.id ?? u.Id ?? null;
                 return {
                     id: resolvedId,
@@ -79,12 +79,11 @@ const Usuarios = () => {
                     idRol: u.idRol ?? u.idrol ?? u.IdRol ?? 0,
                     nombre: u.nombre ?? u.Nombre ?? '',
                     correo: u.correo ?? u.Correo ?? u.email ?? '',
-                    estado: true // Todos los que vienen del backend son activos
+                    estado: u.estado ?? u.Estado ?? true // Mantener el estado real del backend
                 };
             });
 
-            // REEMPLAZAR COMPLETAMENTE EL CACHE CON LOS USUARIOS ACTIVOS
-            setUsuariosCache(usuariosActivos);
+            setUsuariosCache(usuariosProcesados);
 
         } catch (err) {
             const errorMessage = err?.message || 'Error al cargar los usuarios';
@@ -127,8 +126,10 @@ const Usuarios = () => {
         try {
             await usuarioService.delete(id);
             
-            // EN LUGAR DE MARCAR COMO INACTIVO, ELIMINAR DEL CACHE
-            setUsuariosCache(prev => prev.filter(u => u.id !== id));
+            // ACTUALIZAR EL ESTADO EN EL CACHE EN LUGAR DE ELIMINAR
+            setUsuariosCache(prev => prev.map(u => 
+                u.id === id ? { ...u, estado: false } : u
+            ));
             
         } catch (err) { 
             Swal.fire('Error', 'No se pudo desactivar el usuario', 'error');
@@ -137,6 +138,7 @@ const Usuarios = () => {
 
     const handleFormSubmit = async (usuarioData) => {
         try {
+            // PREPARAR EL PAYLOAD CORRECTAMENTE
             const payload = {
                 IdRol: Number(usuarioData.idRol),
                 Nombre: usuarioData.nombre,
@@ -144,46 +146,39 @@ const Usuarios = () => {
                 Estado: usuarioData.estado ? 1 : 0
             };
 
+            // SOLO INCLUIR PASSWORD SI SE PROPORCIONÓ
             if (usuarioData.password && usuarioData.password.trim()) {
                 payload.Password = usuarioData.password;
             }
 
             if (editingUsuario && editingUsuario.id) {
+                // ACTUALIZAR USUARIO EXISTENTE
                 await usuarioService.update(editingUsuario.id, payload);
                 
-                if (usuarioData.estado) {
-                    // Si se activa, actualizar en el cache
-                    setUsuariosCache(prev => {
-                        const index = prev.findIndex(u => u.id === editingUsuario.id);
-                        if (index === -1) return prev;
-                        
-                        const nuevoArray = [...prev];
-                        nuevoArray[index] = {
-                            ...nuevoArray[index],
+                // ACTUALIZAR EN EL CACHE
+                setUsuariosCache(prev => prev.map(u => 
+                    u.id === editingUsuario.id 
+                        ? { 
+                            ...u, 
                             idRol: Number(usuarioData.idRol),
                             nombre: usuarioData.nombre,
                             correo: usuarioData.correo,
-                            estado: true
-                        };
-                        
-                        return nuevoArray;
-                    });
-                } else {
-                    // Si se desactiva, ELIMINAR del cache
-                    setUsuariosCache(prev => prev.filter(u => u.id !== editingUsuario.id));
-                }
+                            estado: usuarioData.estado
+                        } 
+                        : u
+                ));
+                
             } else {
+                // CREAR NUEVO USUARIO
                 await usuarioService.create(payload);
                 
-                // Calcular la última página después de agregar el nuevo usuario
+                // RECARGAR LA LISTA COMPLETA PARA OBTENER EL NUEVO USUARIO CON SU ID
+                await loadUsuarios();
+                
+                // CALCULAR Y MOVER A LA ÚLTIMA PÁGINA
                 const totalUsuariosDespues = usuariosCache.length + 1;
                 const ultimaPagina = Math.ceil(totalUsuariosDespues / itemsPerPage);
-                
-                setTimeout(async () => {
-                    await loadUsuarios();
-                    // Mover automáticamente a la última página (donde está el nuevo usuario)
-                    setCurrentPage(ultimaPagina);
-                }, 500);
+                setCurrentPage(ultimaPagina);
             }
 
             setShowForm(false);
@@ -191,6 +186,7 @@ const Usuarios = () => {
             
         } catch (err) { 
             console.error('Error en handleFormSubmit:', err);
+            // El error ya se maneja en el servicio con SweetAlert
         }
     };
 
