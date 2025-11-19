@@ -10,13 +10,13 @@ import StatsCards from '../components/dashboard/StatsCards';
 import CalendarSection from '../components/dashboard/CalendarSection';
 import ChartsSection from '../components/dashboard/ChartsSection';
 
-// Páginas del sistema
+// Páginas del sistema - TODAS DESCOMENTADAS
 import Roles from '../pages/Roles';
 import Especializaciones from '../pages/Especializaciones';
 import Pacientes from '../pages/Pacientes';
 import Citas from '../pages/Citas';
 import Usuarios from '../pages/Usuarios';
-import Doctor from '../pages/Doctor'
+import Doctor from '../pages/Doctor';
 
 function Dashboard() {
     const [currentScreen, setCurrentScreen] = React.useState('dashboard');
@@ -81,32 +81,27 @@ function Dashboard() {
     const renderContent = () => {
         console.log('🎯 Pantalla actual:', currentScreen);
 
+        // ✅ SWITCH MEJORADO - maneja múltiples IDs y todos los componentes
         switch (currentScreen) {
             case 'dashboard':
+            case 'inicio':
                 return (
                     <div className="dashboard-content-wrapper">
-                        {/* Sección 1: Tarjeta de Bienvenida */}
                         <div className="row mb-4">
                             <div className="col-12">
                                 <WelcomeCard user={user} />
                             </div>
                         </div>
-
-                        {/* Sección 2: Tarjetas de Estadísticas - TODAS EN UNA FILA */}
                         <div className="row mb-4">
                             <div className="col-12">
                                 <StatsCards stats={stats} />
                             </div>
                         </div>
-
-                        {/* Sección 3: Calendario (OCUPA TODO EL ANCHO) */}
                         <div className="row mb-4">
                             <div className="col-12">
                                 <CalendarSection />
                             </div>
                         </div>
-
-                        {/* Sección 4: Gráficas (OCUPA TODO EL ANCHO) */}
                         <div className="row">
                             <div className="col-12">
                                 <ChartsSection stats={stats} />
@@ -114,32 +109,120 @@ function Dashboard() {
                         </div>
                     </div>
                 );
-            case 'appointments':
-                return <div><h1>Citas</h1><p>Gestión de citas médicas</p></div>;
-            case 'doctors':
-                return <div><h1>Médicos</h1><p>Gestión de médicos</p></div>;
-            case 'patients':
-                return <div><h1>Pacientes</h1><p>Gestión de pacientes</p></div>;
-            case 'doctor':
-                return <Doctor />;
-            case 'roles':
-                return <Roles />;
-            case 'especializaciones':
-                return <Especializaciones />;
-            case 'reports':
-                return <div><h1>Reportes</h1><p>Reportes del sistema</p></div>;
-            case 'notifications':
-                return <div><h1>Notificaciones</h1><p>Gestión de notificaciones</p></div>;
+
             case 'citas':
-                return <Citas />;
-            case 'usuarios':
-                return <Usuarios />;
+            case 'appointments':
+                return (
+                    <div className="page-container">
+                        <Citas />
+                    </div>
+                );
+
             case 'pacientes':
-                return <Pacientes />;
+            case 'patients':
+                return (
+                    <div className="page-container">
+                        <Pacientes />
+                    </div>
+                );
+
+            case 'medicos':
+            case 'doctors':
+            case 'doctor':
+                return (
+                    <div className="page-container">
+                        <Doctor />
+                    </div>
+                );
+
+            case 'usuarios':
+            case 'users':
+                return (
+                    <div className="page-container">
+                        <Usuarios />
+                    </div>
+                );
+
+            case 'roles':
+                return (
+                    <div className="page-container">
+                        <Roles />
+                    </div>
+                );
+
+            case 'especializaciones':
+                return (
+                    <div className="page-container">
+                        <Especializaciones />
+                    </div>
+                );
+
+            case 'reportes':
+            case 'reports':
+                return (
+                    <div className="page-container">
+                        <h1>Reportes</h1>
+                        <p>Reportes del sistema</p>
+                    </div>
+                );
+
+            case 'notificaciones':
+            case 'notifications':
+                return (
+                    <div className="page-container">
+                        <h1>Notificaciones</h1>
+                        <p>Gestión de notificaciones</p>
+                    </div>
+                );
+
+            case 'perfil':
+            case 'mi-perfil':
+                return (
+                    <div className="page-container">
+                        <h1>Mi Perfil</h1>
+                        <p>Gestión de perfil de usuario</p>
+                    </div>
+                );
+
+            case 'agendar-cita':
+                return (
+                    <div className="page-container">
+                        <h1>Agendar Cita</h1>
+                        <p>Formulario para agendar nueva cita</p>
+                    </div>
+                );
+
+            case 'mis-citas':
+                return (
+                    <div className="page-container">
+                        <h1>Mis Citas</h1>
+                        <p>Historial y gestión de mis citas</p>
+                    </div>
+                );
+
+            case 'configuracion':
+                return (
+                    <div className="page-container">
+                        <h1>Configuración</h1>
+                        <p>Configuración del sistema</p>
+                    </div>
+                );
+
             default:
                 return (
-                    <div>
-                        <h1>Bienvenido al {currentScreen}</h1>
+                    <div className="page-container" style={{ 
+                        background: '#fff3cd', 
+                        border: '1px solid #ffeaa7',
+                        borderRadius: '8px'
+                    }}>
+                        <h2>🔍 Pantalla no encontrada</h2>
+                        <p>No se encontró configuración para: <strong>{currentScreen}</strong></p>
+                        <button 
+                            onClick={() => handleNavigate('dashboard')}
+                            className="btn btn-primary mt-2"
+                        >
+                            Volver al Dashboard
+                        </button>
                     </div>
                 );
         }
@@ -148,7 +231,6 @@ function Dashboard() {
     return (
         <div className={`dashboard-root ${isSidebarCollapsed ? "sidebar-collapsed" : ""} ${mobileMenuOpen ? "mobile-menu-open" : ""}`}>
             <Sidebar
-                userType={user?.role}
                 currentScreen={currentScreen}
                 onNavigate={handleNavigate}
                 collapsed={isSidebarCollapsed}
@@ -158,16 +240,17 @@ function Dashboard() {
 
             <div className="dashboard-main">
                 <Topbar
-                    userType={user?.role}
+                    userName={userName}
+                    userRole={user?.rol}
                     onLogout={handleLogout}
                     collapsed={isSidebarCollapsed}
                     onToggle={toggleSidebar}
                     currentScreen={currentScreen}
                 />
 
-                <div className="dashboard-content">
+                <main className="dashboard-content">
                     {renderContent()}
-                </div>
+                </main>
             </div>
         </div>
     );

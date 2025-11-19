@@ -12,6 +12,9 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 // Alertas con SweetAlert2
 import 'sweetalert2/dist/sweetalert2.min.css';
 
+// Tus estilos personalizados
+import './assets/styles/Permissions.css'; // ✅ AQUÍ TAMBIÉN
+
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>

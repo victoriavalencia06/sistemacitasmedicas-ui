@@ -6,6 +6,7 @@ export const AuthContext = createContext();
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [refreshTrigger, setRefreshTrigger] = useState(0); // ✅ NUEVO: para forzar actualizaciones
 
   // Función para decodificar y normalizar token JWT
   const decodeToken = (token) => {
@@ -40,6 +41,12 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // ✅ NUEVA FUNCIÓN: Forzar actualización de permisos
+  const refreshPermissions = () => {
+    setRefreshTrigger(prev => prev + 1);
+    console.log('🔁 Forzando actualización de permisos...');
+  };
+
   // Al cargar, revisar si hay token en localStorage
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -50,6 +57,14 @@ export function AuthProvider({ children }) {
     }
     setLoading(false);
   }, []);
+
+  // ✅ NUEVO EFECTO: Se ejecuta cuando cambian los permisos
+  useEffect(() => {
+    if (refreshTrigger > 0) {
+      console.log('🔄 Actualizando contexto de autenticación...');
+      // Aquí puedes agregar lógica adicional para recargar permisos del backend si es necesario
+    }
+  }, [refreshTrigger]);
 
   const login = async ({ correo, password }) => {
     const res = await api.post("/auth/login", { correo, password });
@@ -70,7 +85,14 @@ export function AuthProvider({ children }) {
   const isAuthenticated = !!user;
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, loading, login, logout }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      isAuthenticated, 
+      loading, 
+      login, 
+      logout,
+      refreshPermissions // ✅ EXPONER LA FUNCIÓN DE ACTUALIZACIÓN
+    }}>
       {children}
     </AuthContext.Provider>
   );

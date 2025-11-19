@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { FaPlus, FaSearch } from 'react-icons/fa';
+import { FaPlus, FaSearch, FaUserShield } from 'react-icons/fa'; // ✅ CAMBIADO FaShield por FaUserShield
 import RolList from '../components/roles/RolList';
 import RolForm from '../components/roles/RolForm';
 import rolService from '../services/rolService';
@@ -52,20 +52,15 @@ const Roles = () => {
         setLoading(true);
         setError('');
         try {
-            const data = await rolService.getAll();
-            const rawList = Array.isArray(data) ? data : (data.items || []);
-
-            const mapped = rawList.map((r, index) => {
-                const resolvedId = r.idRol ?? r.idrol ?? r.IdRol ?? r.id ?? r.Id ?? null;
-                return {
-                    id: resolvedId != null && typeof resolvedId === 'string' && /^\d+$/.test(resolvedId)
-                        ? Number(resolvedId)
-                        : resolvedId,
-                    _key: resolvedId != null ? `idRol-${resolvedId}` : `fallback-${index}`,
-                    nombre: r.nombre ?? r.Nombre ?? r.name ?? '',
-                    estado: r.estado === 1 || r.estado === true || String(r.estado) === '1'
-                };
-            });
+            // Usar el nuevo método que incluye permisos
+            const data = await rolService.getAllWithPermissions();
+            const mapped = data.map((rol) => ({
+                id: rol.idRol,
+                _key: `idRol-${rol.idRol}`,
+                nombre: rol.nombre,
+                estado: rol.estado === 1,
+                permisos: rol.permisos || []
+            }));
 
             setRoles(mapped);
         } catch (err) {
@@ -89,8 +84,8 @@ const Roles = () => {
 
     const handleDelete = async (id) => {
         const result = await Swal.fire({
-            title: '¿Estás seguro de desactivar el registro?',
-            text: "¡No podrás revertir esta acción!",
+            title: '¿Estás seguro de desactivar el rol?',
+            text: "Los usuarios con este rol perderán acceso al sistema",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
@@ -103,28 +98,36 @@ const Roles = () => {
         if (!result.isConfirmed) return;
 
         try {
-            await rolService.delete(id);
+            await rolService.deactivate(id);
             await loadRoles();
-        } catch (err) { }
+        } catch (err) {
+            // El error ya se maneja en el servicio
+        }
+    };
+
+    const handleReactivate = async (id) => {
+        try {
+            await rolService.reactivate(id);
+            await loadRoles();
+        } catch (err) {
+            // El error ya se maneja en el servicio
+        }
     };
 
     const handleFormSubmit = async (rolData) => {
         try {
-            const payload = {
-                Nombre: rolData.nombre ?? '',
-                Estado: rolData.estado ? 1 : 0
-            };
-
             if (editingRol && editingRol.id) {
-                await rolService.update(editingRol.id, payload);
+                await rolService.updateWithPermissions(editingRol.id, rolData);
             } else {
-                await rolService.create(payload);
+                await rolService.createWithPermissions(rolData);
             }
 
             setShowForm(false);
             setEditingRol(null);
             await loadRoles();
-        } catch (err) { }
+        } catch (err) {
+            // El error ya se maneja en el servicio
+        }
     };
 
     const handleCancel = () => {
@@ -164,7 +167,10 @@ const Roles = () => {
     return (
         <div className="management-container">
             <div className="management-header">
-                <h1 className="management-title">Gestión de Roles</h1>
+                <div className="header-title-section">
+                    <FaUserShield className="header-icon" /> {/* ✅ CAMBIADO */}
+                    <h1 className="management-title">Gestión de Roles y Permisos</h1>
+                </div>
                 {!showForm && (
                     <button onClick={handleCreate} className="btn-management">
                         <FaPlus style={{ marginRight: 6 }} /> Nuevo Rol
@@ -189,7 +195,11 @@ const Roles = () => {
             <AlertMessage type="error" message={error} />
 
             {showForm ? (
-                <RolForm rol={editingRol} onSubmit={handleFormSubmit} onCancel={handleCancel} />
+                <RolForm 
+                    rol={editingRol} 
+                    onSubmit={handleFormSubmit} 
+                    onCancel={handleCancel} 
+                />
             ) : (
                 <>
                     <RolList
@@ -197,6 +207,7 @@ const Roles = () => {
                         loading={loading}
                         onEdit={handleEdit}
                         onDelete={handleDelete}
+                        onReactivate={handleReactivate}
                     />
                     {totalPages > 1 && (
                         <Pagination

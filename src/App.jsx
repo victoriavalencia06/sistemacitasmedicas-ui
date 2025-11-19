@@ -5,7 +5,8 @@ import Login from './pages/auth/Login';
 import Dashboard from './pages/Dashboard';
 import Register from './pages/auth/Register';
 import Home from './pages/Home';
-import Roles from './pages/Roles'
+// Importa el CSS de permisos aquí
+import './assets/styles/Permissions.css';
 
 function App() {
   const { isAuthenticated, loading } = useContext(AuthContext);
@@ -35,17 +36,18 @@ function App() {
           element={!isAuthenticated ? <Register /> : <Navigate to="/dashboard" replace />}
         />
 
+        {/* ✅ SOLO UNA RUTA PARA DASHBOARD - maneja todo internamente */}
         <Route
           path="/dashboard/*"
           element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" replace />}
         />
 
-        <Route
-          path="/roles"
-          element={isAuthenticated ? <Roles /> : <Navigate to="/login" replace />}
-        />
+        {/* ❌ ELIMINADA la ruta /roles separada - ahora está dentro de Dashboard */}
 
         <Route path="/" element={<Navigate to="/home" replace />} />
+
+        {/* Ruta de fallback para URLs no encontradas */}
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </div>
   );
