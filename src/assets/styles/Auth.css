@@ -167,6 +167,46 @@
     color: var(--primary-blue);
 }
 
+/* Spinner animation */
+.spinning {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Estilos para el botón deshabilitado */
+.btn-login:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Mejora visual para el estado de carga */
+.btn-login {
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.btn-login:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Asegurar que el texto se alinee bien con el icono */
+.btn-login {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
 /* === RESPONSIVE === */
 @media (max-width:576px) {
     .auth-container {

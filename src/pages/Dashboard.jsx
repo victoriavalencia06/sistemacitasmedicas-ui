@@ -6,9 +6,6 @@ import '../assets/styles/Dashboard.css';
 
 // Componentes del Dashboard
 import WelcomeCard from '../components/dashboard/WelcomeCard';
-import StatsCards from '../components/dashboard/StatsCards';
-import CalendarSection from '../components/dashboard/CalendarSection';
-import ChartsSection from '../components/dashboard/ChartsSection';
 
 // Páginas del sistema - TODAS DESCOMENTADAS
 import Roles from '../pages/Roles';
@@ -22,33 +19,15 @@ function Dashboard() {
     const [currentScreen, setCurrentScreen] = React.useState('dashboard');
     const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
-    const [stats, setStats] = useState({
-        totalPatients: 0,
-        todayAppointments: 0,
-        availableSlots: 0,
-        consultationsThisMonth: 0
-    });
 
     const { user, logout } = useContext(AuthContext);
     const userName = user?.nombre || "Usuario";
 
     useEffect(() => {
         if (currentScreen === 'dashboard') {
-            loadDashboardData();
+            // Código para cargar datos reales si es necesario
         }
     }, [currentScreen]);
-
-    const loadDashboardData = async () => {
-        // Simulación de carga de datos del dashboard
-        setTimeout(() => {
-            setStats({
-                totalPatients: 156,
-                todayAppointments: 8,
-                availableSlots: 12,
-                consultationsThisMonth: 45
-            });
-        }, 1000);
-    };
 
     const handleNavigate = (screen) => {
         console.log('🔄 Navegando a:', screen);
@@ -90,21 +69,6 @@ function Dashboard() {
                         <div className="row mb-4">
                             <div className="col-12">
                                 <WelcomeCard user={user} />
-                            </div>
-                        </div>
-                        <div className="row mb-4">
-                            <div className="col-12">
-                                <StatsCards stats={stats} />
-                            </div>
-                        </div>
-                        <div className="row mb-4">
-                            <div className="col-12">
-                                <CalendarSection />
-                            </div>
-                        </div>
-                        <div className="row">
-                            <div className="col-12">
-                                <ChartsSection stats={stats} />
                             </div>
                         </div>
                     </div>
@@ -210,14 +174,14 @@ function Dashboard() {
 
             default:
                 return (
-                    <div className="page-container" style={{ 
-                        background: '#fff3cd', 
+                    <div className="page-container" style={{
+                        background: '#fff3cd',
                         border: '1px solid #ffeaa7',
                         borderRadius: '8px'
                     }}>
                         <h2>🔍 Pantalla no encontrada</h2>
                         <p>No se encontró configuración para: <strong>{currentScreen}</strong></p>
-                        <button 
+                        <button
                             onClick={() => handleNavigate('dashboard')}
                             className="btn btn-primary mt-2"
                         >

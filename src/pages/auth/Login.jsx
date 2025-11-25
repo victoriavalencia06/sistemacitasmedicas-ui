@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { FaStethoscope, FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaStethoscope, FaEye, FaEyeSlash, FaSpinner } from "react-icons/fa";
 import { useState, useContext } from "react";
 import "../../assets/styles/Auth.css";
 import { Link, useNavigate } from "react-router-dom";
@@ -13,10 +13,13 @@ export default function Login() {
   } = useForm();
 
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false); // Estado para el spinner
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const onSubmit = async (data) => {
+    setLoading(true); // Activar spinner
+
     try {
       const body = {
         correo: data.email,
@@ -27,6 +30,8 @@ export default function Login() {
     } catch (err) {
       console.error(err);
       alert("Error al iniciar sesión. Verifica tus credenciales.");
+    } finally {
+      setLoading(false); // Desactivar spinner siempre
     }
   };
 
@@ -94,8 +99,19 @@ export default function Login() {
               )}
             </div>
 
-            <button type="submit" className="btn btn-primary btn-login">
-              Iniciar Sesión
+            <button
+              type="submit"
+              className="btn btn-primary btn-login"
+              disabled={loading} // Deshabilitar botón durante carga
+            >
+              {loading ? (
+                <>
+                  <FaSpinner className="spinning me-2" />
+                  Iniciando sesión...
+                </>
+              ) : (
+                "Iniciar Sesión"
+              )}
             </button>
 
             <div className="links-container column-links">
