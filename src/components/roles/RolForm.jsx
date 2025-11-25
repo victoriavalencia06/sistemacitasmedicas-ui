@@ -103,41 +103,37 @@ const RolForm = ({ rol, onSubmit, onCancel }) => {
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (!validateForm()) return;
+    e.preventDefault();
+    if (!validateForm()) return;
 
-        // ✅ Asegurar que permissions tenga todos los menús, no solo los modificados
-        const payload = {
-            nombre: formData.nombre.trim(),
-            estado: formData.estado ? 1 : 0,
-            permisos: permissions.length > 0 ? permissions : []
-        };
+    const payload = {
+        nombre: formData.nombre.trim(),
+        estado: formData.estado ? 1 : 0,
+        permisos: permissions.length > 0 ? permissions : []
+    };
 
-        if (rol && !formData.estado) {
-            const result = await Swal.fire({
-                title: 'Vas a dejar el rol inactivo',
-                html: 'Si guardas este rol como <strong>inactivo</strong>, no podrá ser asignado ni utilizado en el sistema. ¿Deseas continuar?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Sí, guardar inactivo',
-                cancelButtonText: 'Cancelar',
-                reverseButtons: true,
-                focusCancel: true
-            });
+    if (rol && !formData.estado) {
+        const result = await Swal.fire({
+        title: 'Vas a dejar el rol inactivo',
+        html: 'Si guardas este rol como <strong>inactivo</strong>, no podrá ser asignado ni utilizado en el sistema. ¿Deseas continuar?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, guardar inactivo',
+        cancelButtonText: 'Cancelar',
+        reverseButtons: true,
+        focusCancel: true
+        });
 
-            if (!result.isConfirmed) {
-                return;
-            }
+        if (!result.isConfirmed) {
+        return;
         }
+    }
 
-        // ✅ LLAMAR A LA FUNCIÓN onSubmit QUE VIENE DEL COMPONENTE PADRE
-        await onSubmit(payload);
-        
-        // ✅ ACTUALIZAR PERMISOS EN EL CONTEXTO
-        refreshPermissions();
-        
-        // ✅ REDIRIGIR A LA MISMA RUTA SIN RECARGAR
-        navigate('/dashboard/roles', { replace: true });
+    await onSubmit(payload);
+    
+    refreshPermissions();
+    
+    navigate('/dashboard/roles', { replace: true });
     };
 
     return (
