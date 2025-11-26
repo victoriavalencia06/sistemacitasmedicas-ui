@@ -199,51 +199,68 @@ const CalendarSection = () => {
                 </div>
             </div>
 
-            {/* Modal */}
+            {/* MODAL MODERNO - Versión mejorada */}
             {showModal && (
-                <div className="modal-normal-overlay" role="dialog" aria-modal="true">
-                    <div className="modal-normal">
-                        <div className="modal-normal-header">
-                            <div className="d-flex align-items-center">
-                                <FaCalendarAlt className="me-2 text-primary" />
-                                <div>
-                                    <h6 className="mb-0 fw-bold">Citas del Día</h6>
-                                    <small className="text-muted">
-                                        {selectedDate.toLocaleDateString('es-ES', {
-                                            weekday: 'short', day: 'numeric', month: 'short', year: 'numeric'
-                                        })}
-                                    </small>
+                <div className="modal-modern-overlay" role="dialog" aria-modal="true">
+                    <div className="modal-modern">
+                        <div className="modal-modern-header">
+                            <div className="modal-modern-header-content">
+                                <div className="modal-modern-icon">
+                                    <FaCalendarAlt />
+                                </div>
+                                <div className="modal-modern-title-section">
+                                    <h5>Citas del día</h5>
+                                    <div className="modal-modern-subtitle">
+                                        <span>{selectedDate.toLocaleDateString('es-ES', {
+                                            weekday: 'long',
+                                            day: 'numeric',
+                                            month: 'long',
+                                            year: 'numeric'
+                                        })}</span>
+                                        <span>•</span>
+                                        <span>{dayDetails.length} {dayDetails.length === 1 ? 'cita' : 'citas'}</span>
+                                    </div>
                                 </div>
                             </div>
-                            <button className="btn-close-transparent" onClick={() => setShowModal(false)}>
-                                <FaTimes size={14} />
+                            <button className="modal-modern-close" onClick={() => setShowModal(false)} aria-label="Cerrar">
+                                <FaTimes />
                             </button>
                         </div>
 
-                        <div className="modal-normal-body">
+                        <div className="modal-modern-body">
                             {loadingDay ? (
-                                <div className="text-center py-3">
-                                    <div className="spinner-border spinner-border-sm text-primary"></div>
-                                    <p className="text-muted mt-2 mb-0 small">Cargando citas...</p>
+                                <div className="modal-modern-loading">
+                                    <div className="spinner-border text-primary"></div>
+                                    <p className="text-muted mb-0">Cargando citas...</p>
                                 </div>
                             ) : dayDetails.length === 0 ? (
-                                <div className="text-center py-3">
-                                    <FaCalendarAlt className="text-muted mb-2" size={24} />
-                                    <p className="text-muted mb-0 small">No hay citas programadas</p>
+                                <div className="modal-modern-empty">
+                                    <FaCalendarAlt className="modal-modern-empty-icon" />
+                                    <p className="modal-modern-empty-text">No hay citas programadas para este día</p>
                                 </div>
                             ) : (
-                                <div>
-                                    {dayDetails.map((appt, index) => (
-                                        <div key={appt.idCita ?? index} className="cita-item-normal">
-                                            <div className="cita-time-normal">
-                                                {new Date(appt.fechaHora).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+                                <div className="modal-modern-list">
+                                    {dayDetails.map((appt, idx) => (
+                                        <div key={appt.idCita ?? idx} className="modal-modern-item">
+                                            <div className="modal-modern-time">
+                                                <FaClock />
+                                                <span>
+                                                    {new Date(appt.fechaHora).toLocaleTimeString('es-ES', {
+                                                        hour: '2-digit',
+                                                        minute: '2-digit'
+                                                    })}
+                                                </span>
                                             </div>
-                                            <div className="cita-info-normal">
-                                                <div className="cita-paciente-normal">{appt.paciente}</div>
-                                                <div className="cita-doctor-normal">{appt.doctor}</div>
+
+                                            <div className="modal-modern-content">
+                                                <div className="modal-modern-patient">{appt.paciente}</div>
+                                                <div className="modal-modern-doctor">{appt.doctor}</div>
                                             </div>
-                                            <div className={`cita-status-normal ${appt.estado ? 'text-success' : 'text-danger'}`}>
-                                                {appt.estado ? 'Activa' : 'Inactiva'}
+
+                                            <div className="modal-modern-meta">
+                                                <span className={`status-modern ${appt.estado ? 'active' : 'inactive'}`}>
+                                                    {appt.estado ? 'Activa' : 'Inactiva'}
+                                                </span>
                                             </div>
                                         </div>
                                     ))}
@@ -251,9 +268,9 @@ const CalendarSection = () => {
                             )}
                         </div>
 
-                        <div className="modal-normal-footer">
-                            <button className="btn btn-sm btn-outline-secondary" onClick={() => setShowModal(false)}>
-                                <FaTimes className="me-1" size={12} /> Cerrar
+                        <div className="modal-modern-footer">
+                            <button className="btn btn-outline-secondary" onClick={() => setShowModal(false)}>
+                                <FaTimes className="me-2" /> Cerrar
                             </button>
                         </div>
                     </div>

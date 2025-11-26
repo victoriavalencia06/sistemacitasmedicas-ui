@@ -50,6 +50,21 @@ const pacienteService = {
         }
     },
 
+    getTotalPatients: async () => {
+        try {
+            const response = await api.get('/paciente/count');
+            // Puede devolver { totalPatients: n } o simplemente n
+            const data = response.data;
+            if (typeof data === 'number') return data;
+            if (data == null) return 0;
+
+            return data.totalPatients ?? data.totalpatients ?? data.total ?? 0;
+        } catch (error) {
+            console.error('Error en getTotalPatients:', error);
+            throw error.response?.data || new Error('Error al obtener total de pacientes');
+        }
+    },
+
     // Crear nuevo paciente
     create: async (pacienteData) => {
         try {

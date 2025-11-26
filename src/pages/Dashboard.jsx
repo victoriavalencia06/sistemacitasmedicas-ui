@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useCallback } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import Topbar from '../components/dashboard/Topbar';
 import Sidebar from '../components/dashboard/Sidebar';
@@ -7,6 +7,8 @@ import '../assets/styles/Dashboard.css';
 // Componentes del Dashboard
 import WelcomeCard from '../components/dashboard/WelcomeCard';
 import CalendarSection from '../components/dashboard/CalendarSection';
+import statsService from '../services/statsService'; // <-- import statsService
+import StatsCards from '../components/dashboard/StatsCards';
 
 // Páginas del sistema - TODAS DESCOMENTADAS
 import Roles from '../pages/Roles';
@@ -21,14 +23,43 @@ function Dashboard() {
     const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
+    // Stats state (padre) — lo pasamos a StatsCards para que NO haga fetch por su cuenta
+    const [stats, setStats] = useState({
+        loading: true,
+        error: null,
+        totalPatients: 0,
+        todayAppointments: 0,
+        availableSlots: 0,
+        consultationsThisMonth: 0
+    });
+
     const { user, logout } = useContext(AuthContext);
     const userName = user?.nombre || "Usuario";
 
+    // Función para cargar stats (puedes ajustar slotsPerDay aquí)
+    const loadStats = useCallback(async ({ date = new Date(), slotsPerDay = 20 } = {}) => {
+        setStats(prev => ({ ...prev, loading: true, error: null }));
+        try {
+            const overview = await statsService.getOverview({ date, slotsPerDay });
+            setStats({
+                loading: false,
+                error: null,
+                totalPatients: Number(overview.totalPatients ?? 0),
+                todayAppointments: Number(overview.todayAppointments ?? 0),
+                availableSlots: Number(overview.availableSlots ?? overview.availableSlots ?? 0),
+                consultationsThisMonth: Number(overview.consultationsThisMonth ?? 0)
+            });
+        } catch (err) {
+            console.error('Error cargando stats en Dashboard:', err);
+            setStats(prev => ({ ...prev, loading: false, error: err?.message || 'Error cargando estadísticas' }));
+        }
+    }, []);
+
     useEffect(() => {
         if (currentScreen === 'dashboard') {
-            // Código para cargar datos reales si es necesario
+            loadStats();
         }
-    }, [currentScreen]);
+    }, [currentScreen, loadStats]);
 
     const handleNavigate = (screen) => {
         console.log('🔄 Navegando a:', screen);
@@ -58,6 +89,11 @@ function Dashboard() {
 
     const isSidebarCollapsed = window.innerWidth <= 768 ? !mobileMenuOpen : sidebarCollapsed;
 
+    // onRetry que pasamos a StatsCards: recarga las stats desde el padre
+    const handleStatsRetry = async () => {
+        await loadStats();
+    };
+
     const renderContent = () => {
         console.log('🎯 Pantalla actual:', currentScreen);
 
@@ -70,6 +106,14 @@ function Dashboard() {
                         <div className="row mb-4">
                             <div className="col-12">
                                 <WelcomeCard user={user} />
+                            </div>
+                        </div>
+
+                        {/* Stat cards row */}
+                        <div className="row mb-4">
+                            <div className="col-12">
+                                {/* Pasamos stats y onRetry para que StatsCards muestre datos del padre */}
+                                <StatsCards stats={stats} onRetry={handleStatsRetry} />
                             </div>
                         </div>
 
