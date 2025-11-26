@@ -6,6 +6,7 @@ import '../assets/styles/Dashboard.css';
 
 // Componentes del Dashboard
 import WelcomeCard from '../components/dashboard/WelcomeCard';
+import CalendarSection from '../components/dashboard/CalendarSection';
 
 // Páginas del sistema - TODAS DESCOMENTADAS
 import Roles from '../pages/Roles';
@@ -69,6 +70,12 @@ function Dashboard() {
                         <div className="row mb-4">
                             <div className="col-12">
                                 <WelcomeCard user={user} />
+                            </div>
+                        </div>
+
+                        <div className="row mb-4">
+                            <div className="col-12">
+                                <CalendarSection />
                             </div>
                         </div>
                     </div>

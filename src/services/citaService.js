@@ -4,12 +4,12 @@ import Swal from 'sweetalert2';
 function extractValidationMessages(apiData) {
     const msgs = [];
     const errors = apiData?.errors;
-    
+
     if (!errors) {
         if (apiData?.message) msgs.push(apiData.message);
         return msgs;
     }
-    
+
     for (const key of Object.keys(errors)) {
         const arr = errors[key];
         if (Array.isArray(arr)) arr.forEach(m => msgs.push(`${key}: ${m}`));
@@ -18,7 +18,21 @@ function extractValidationMessages(apiData) {
     return msgs;
 }
 
+// Helper: formatea Date o string a YYYY-MM-DD
+function formatDateKey(input) {
+    if (!input) return null;
+    const d = input instanceof Date ? input : new Date(input);
+    if (Number.isNaN(d.getTime())) return null;
+    return d.toISOString().slice(0, 10); // 'YYYY-MM-DD'
+}
+
 const citaService = {
+    // caches simples en memoria
+    _monthCache: {},   // key: 'YYYY-MM' -> array de citas
+    _dayCache: {},     // key: 'YYYY-MM-DD' -> array de citas
+    _countsCache: {},  // key: 'YYYY-MM' -> { 'YYYY-MM-DD': n }
+
+    /* ---------- EXISTENTES ---------- */
     getAll: async () => {
         try {
             console.log('🔍 Obteniendo todas las citas...');
@@ -43,81 +57,141 @@ const citaService = {
         }
     },
 
-    // Nuevos métodos para obtener usuarios y doctores
-    getUsuariosActivos: async () => {
+    /* ---------- NUEVOS MÉTODOS PARA CALENDARIO ---------- */
+
+    // Obtener todas las citas de un mes (year: 2025, month: 11)
+    // forceRefresh: ignorar cache si true
+    getByMonth: async (year, month, forceRefresh = false) => {
         try {
-            console.log('🔍 Obteniendo usuarios activos...');
-            const response = await api.get('/usuario/getAll'); // Ajusta la ruta según tu API
-            const usuarios = Array.isArray(response.data) ? response.data : (response.data.items || []);
-            const usuariosActivos = usuarios.filter(usuario => usuario.estado === true || usuario.estado === 1);
-            console.log('✅ Usuarios activos:', usuariosActivos);
-            return usuariosActivos;
+            const key = `${String(year).padStart(4, '0')}-${String(month).padStart(2, '0')}`; // 'YYYY-MM'
+            if (!forceRefresh && citaService._monthCache[key]) {
+                console.log(`📦 Usando cache month ${key}`);
+                return citaService._monthCache[key];
+            }
+
+            console.log(`🔍 Obteniendo citas del mes ${key}...`);
+            const response = await api.get(`/cita/month?year=${year}&month=${month}`);
+            let data = response.data;
+
+            // Puede devolverse { appointments: [...] } o un array directamente
+            let appointments = Array.isArray(data) ? data : (data?.appointments || data?.appointments || []);
+
+            // Si la API devuelve otro wrapper (p. ej. {appointments: { ... }}) intenta detectar
+            if (!Array.isArray(appointments) && typeof appointments === 'object') {
+                // intentar extraer propiedades comunes
+                appointments = Object.values(appointments).flat ? Object.values(appointments).flat() : [];
+            }
+
+            citaService._monthCache[key] = appointments;
+            console.log(`✅ Month ${key} cargado. Total: ${appointments.length}`);
+            return appointments;
         } catch (error) {
-            console.error('❌ Error al obtener usuarios activos:', error);
-            return [];
+            console.error('❌ Error en GET BY MONTH:', error);
+            throw error.response?.data || new Error('Error al obtener citas por mes');
         }
     },
 
-    getDoctoresActivos: async () => {
+    // Obtener conteos por día para un mes -> ideal para badges
+    // Retorna un objeto: { 'YYYY-MM-DD': number, ... }
+    getCountsByMonth: async (year, month, forceRefresh = false) => {
         try {
-            console.log('🔍 Obteniendo doctores activos...');
-            const response = await api.get('/doctor/getAll'); // Ajusta la ruta según tu API
-            const doctores = Array.isArray(response.data) ? response.data : (response.data.items || []);
-            const doctoresActivos = doctores.filter(doctor => doctor.estado === true || doctor.estado === 1);
-            console.log('✅ Doctores activos:', doctoresActivos);
-            return doctoresActivos;
+            const key = `${String(year).padStart(4, '0')}-${String(month).padStart(2, '0')}`;
+            if (!forceRefresh && citaService._countsCache[key]) {
+                console.log(`📦 Usando cache counts ${key}`);
+                return citaService._countsCache[key];
+            }
+
+            console.log(`🔍 Obteniendo counts para ${key}...`);
+            const response = await api.get(`/cita/counts/month?year=${year}&month=${month}`);
+            let data = response.data;
+
+            // Forma esperada: { counts: { 'YYYY-MM-DD': n } } o directamente { 'YYYY-MM-DD': n } o array
+            let counts = {};
+            if (data == null) counts = {};
+            else if (data.counts && typeof data.counts === 'object') counts = data.counts;
+            else if (typeof data === 'object' && !Array.isArray(data)) {
+                // Si es un objeto plano con keys de fecha
+                counts = data.counts || data;
+            }
+
+            citaService._countsCache[key] = counts;
+            console.log(`✅ Counts ${key} cargado. Días con citas: ${Object.keys(counts).length}`);
+            return counts;
         } catch (error) {
-            console.error('❌ Error al obtener doctores activos:', error);
-            return [];
+            console.error('❌ Error en GET COUNTS BY MONTH:', error);
+            throw error.response?.data || new Error('Error al obtener conteos por mes');
         }
     },
 
-    getPacientesActivos: async () => {
+    // Obtener citas de un día específico. date puede ser 'YYYY-MM-DD' o Date
+    // forceRefresh ignorará cache
+    getByDay: async (date, forceRefresh = false) => {
         try {
-            console.log('🔍 Obteniendo pacientes activos...');
-            const response = await api.get('/paciente/getAll'); // Ajusta la ruta según tu API
-            const pacientes = Array.isArray(response.data) ? response.data : (response.data.items || []);
-            const pacientesActivos = pacientes.filter(paciente => paciente.estado === true || paciente.estado === 1);
-            console.log('✅ Pacientes activos:', pacientesActivos);
-            return pacientesActivos;
+            const key = formatDateKey(date);
+            if (!key) throw new Error('Fecha inválida');
+
+            if (!forceRefresh && citaService._dayCache[key]) {
+                console.log(`📦 Usando cache day ${key}`);
+                return citaService._dayCache[key];
+            }
+
+            console.log(`🔍 Obteniendo citas del día ${key}...`);
+            const response = await api.get(`/cita/day?date=${key}`);
+            let data = response.data;
+
+            // Puede venir { date: 'YYYY-MM-DD', appointments: [...] } o un array directamente
+            let appointments = [];
+            if (Array.isArray(data)) appointments = data;
+            else if (Array.isArray(data?.appointments)) appointments = data.appointments;
+            else if (data?.appointments && typeof data.appointments === 'object') {
+                // posible caso raro
+                appointments = Array.isArray(data.appointments) ? data.appointments : Object.values(data.appointments).flat();
+            }
+
+            citaService._dayCache[key] = appointments;
+            console.log(`✅ Day ${key} cargado: ${appointments.length} citas`);
+            return appointments;
         } catch (error) {
-            console.error('❌ Error al obtener pacientes activos:', error);
-            return [];
+            console.error('❌ Error en GET BY DAY:', error);
+            throw error.response?.data || new Error('Error al obtener citas por día');
         }
     },
 
+    /* ---------- RESTO DE MÉTODOS EXISTENTES (create/update/delete) ---------- */
     create: async (citaData) => {
         try {
             console.log('🎯 Service CREATE llamado con:', citaData);
-            
-            // Validar que todos los campos requeridos estén presentes
+
             if (!citaData.idUsuario || !citaData.idPaciente || !citaData.idDoctor || !citaData.fechaHora) {
                 throw new Error('Todos los campos son requeridos (Usuario, Paciente, Doctor, Fecha y Hora)');
             }
 
-            // ✅ CORREGIDO: Usar la fecha seleccionada por el usuario
             const fechaHoraSeleccionada = new Date(citaData.fechaHora).toISOString();
-            console.log('🕐 Usando fecha/hora seleccionada:', fechaHoraSeleccionada);
-
-            // PAYLOAD CORREGIDO
             const payload = {
                 idUsuario: parseInt(citaData.idUsuario),
                 idPaciente: parseInt(citaData.idPaciente),
                 idDoctor: parseInt(citaData.idDoctor),
-                fechaHora: fechaHoraSeleccionada, // ← AHORA usa la fecha del usuario
+                fechaHora: fechaHoraSeleccionada,
                 estado: citaData.estado ? 1 : 0
             };
 
             console.log('📤 Payload final:', JSON.stringify(payload, null, 2));
 
             const response = await api.post('/cita/create', payload, {
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json'
                 }
             });
 
             console.log('✅ Cita creada exitosamente:', response.data);
+
+            // invalidar caches del mes y dia relacionados
+            const keyMonth = fechaHoraSeleccionada.slice(0, 7); // YYYY-MM
+            const keyDay = fechaHoraSeleccionada.slice(0, 10);  // YYYY-MM-DD
+            delete citaService._monthCache[keyMonth];
+            delete citaService._dayCache[keyDay];
+            delete citaService._countsCache[keyMonth];
 
             await Swal.fire({
                 icon: 'success',
@@ -128,14 +202,13 @@ const citaService = {
             });
 
             return response.data;
-            
         } catch (error) {
             console.error('❌ ERROR en service CREATE:', error);
             console.error('🔢 Status:', error.response?.status);
             console.error('📦 Data:', error.response?.data);
-            
+
             let errorMessage = 'Error al crear la cita';
-            
+
             if (error.response?.data) {
                 const apiData = error.response.data;
                 const msgs = extractValidationMessages(apiData);
@@ -158,29 +231,33 @@ const citaService = {
     update: async (id, citaData) => {
         try {
             console.log(`🎯 Service UPDATE llamado para ID: ${id}`, citaData);
-            
-            // ✅ CORREGIDO: Usar la fecha seleccionada por el usuario
+
             if (!citaData.fechaHora) {
                 throw new Error('La fecha y hora son requeridas');
             }
-            
-            const fechaHoraSeleccionada = new Date(citaData.fechaHora).toISOString();
 
-            // PAYLOAD para update
+            const fechaHoraSeleccionada = new Date(citaData.fechaHora).toISOString();
             const payload = {
                 idCita: parseInt(id),
                 idUsuario: parseInt(citaData.idUsuario),
                 idPaciente: parseInt(citaData.idPaciente),
                 idDoctor: parseInt(citaData.idDoctor),
-                fechaHora: fechaHoraSeleccionada, // ← AHORA usa la fecha del usuario
+                fechaHora: fechaHoraSeleccionada,
                 estado: citaData.estado ? 1 : 0
             };
 
             console.log(`📤 Enviando PUT a /cita/update/${id} con payload:`, JSON.stringify(payload, null, 2));
-            
+
             const response = await api.put(`/cita/update/${id}`, payload, {
                 headers: { 'Content-Type': 'application/json' }
             });
+
+            // invalidar caches del mes y dia relacionados
+            const keyMonth = fechaHoraSeleccionada.slice(0, 7);
+            const keyDay = fechaHoraSeleccionada.slice(0, 10);
+            delete citaService._monthCache[keyMonth];
+            delete citaService._dayCache[keyDay];
+            delete citaService._countsCache[keyMonth];
 
             console.log(`✅ Cita actualizada:`, response.data);
 
@@ -196,9 +273,9 @@ const citaService = {
         } catch (error) {
             console.error(`❌ Error en UPDATE ${id}:`, error);
             console.error('❌ Response data:', error.response?.data);
-            
+
             let errorMessage = 'Error al actualizar la cita';
-            
+
             if (error.response?.data) {
                 const apiData = error.response.data;
                 const msgs = extractValidationMessages(apiData);
@@ -219,7 +296,12 @@ const citaService = {
         try {
             console.log(`🗑️ Service DELETE llamado para ID: ${id}`);
             const response = await api.delete(`/cita/delete/${id}`);
-            
+
+            // invalidar caches relevantes (no sabemos la fecha aquí, así que opcional)
+            citaService._monthCache = {};
+            citaService._dayCache = {};
+            citaService._countsCache = {};
+
             console.log(`✅ Respuesta de DELETE ${id}:`, response.data);
 
             await Swal.fire({
@@ -229,7 +311,7 @@ const citaService = {
                 timer: 1200,
                 showConfirmButton: false
             });
-            
+
             return response.data;
         } catch (error) {
             console.error(`❌ Error en service DELETE ${id}:`, error);
@@ -245,6 +327,14 @@ const citaService = {
 
             throw apiData || new Error('Error al eliminar cita');
         }
+    },
+
+    /* ---------- MÉTODOS AUXILIARES (para debug/limpiar caches) ---------- */
+    clearCaches: () => {
+        citaService._monthCache = {};
+        citaService._dayCache = {};
+        citaService._countsCache = {};
+        console.log('Caches limpiadas.');
     }
 };
 

@@ -685,6 +685,197 @@ input:checked+.slider:before {
     box-shadow: 0 0 0 3px rgba(0, 71, 148, 0.1) !important;
 }
 
+/* ------------- CALENDARIO HORIZONTAL COMPACTO ------------- */
+/* contenedor de la fila: 7 columnas, aspecto compacto */
+.calendar-horizontal {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px 8px;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+/* cada "día" es una celda muy horizontal y plana (no caja grande) */
+.calendar-day-horizontal {
+    height: 28px;
+    /* más compacto */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.12s ease, background-color 0.12s ease;
+    position: relative;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #212529;
+    background: transparent;
+    /* sin fondo pesado */
+    border: none;
+    /* sin borde por defecto */
+    border-bottom: 2px solid transparent;
+    /* línea fina inferior */
+    padding: 0 6px;
+    border-radius: 4px;
+}
+
+/* hover suave pero contenido */
+.calendar-day-horizontal:hover {
+    transform: translateY(-2px);
+    background: rgba(0, 0, 0, 0.03);
+}
+
+/* día de hoy: subrayado con color (no caja completa) */
+.calendar-day-horizontal.calendar-today-horizontal {
+    border-bottom-color: #0d6efd;
+    /* azul bootstrap */
+    color: #0d6efd;
+}
+
+/* día seleccionado: subrayado y color más fuerte */
+.calendar-day-horizontal.calendar-selected-horizontal {
+    border-bottom-color: #004794;
+    color: #004794;
+    background: rgba(0, 71, 148, 0.04);
+}
+
+/* días con citas: pequeño indicador (punto) arriba de la línea */
+.calendar-day-horizontal.calendar-busy-horizontal::after {
+    content: "";
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    width: 7px;
+    height: 7px;
+    background: #dc3545;
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.08);
+}
+
+/* número del día */
+.day-number-horizontal {
+    line-height: 1;
+}
+
+/* leyenda compacta */
+.legend-dot-horizontal {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.legend-row {
+    gap: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ---------------- MODAL NORMAL (estilo contenido como DoctorDetails) ---------------- */
+.modal-normal-overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 1050;
+    padding: 16px;
+}
+
+.modal-normal {
+    width: 100%;
+    max-width: 540px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* header parecido a DoctorDetails */
+.modal-normal-header {
+    padding: 12px 16px;
+    background: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.modal-normal-body {
+    padding: 14px 16px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.modal-normal-footer {
+    padding: 12px 16px;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+/* item de cita más compacto para este modal normal */
+.cita-item-normal {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 8px;
+    border-radius: 6px;
+    background: #fff;
+    border-left: 3px solid rgba(0, 123, 255, 0.12);
+    margin-bottom: 8px;
+}
+
+.cita-time-normal {
+    background: #0d6efd;
+    color: white;
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    min-width: 64px;
+    text-align: center;
+    font-weight: 700;
+}
+
+.cita-info-normal {
+    flex: 1;
+}
+
+.cita-paciente-normal {
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.cita-doctor-normal {
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+.cita-status-normal {
+    font-weight: 700;
+    font-size: 0.78rem;
+}
+
+/* responsive - apilar en móviles */
+@media (max-width: 576px) {
+    .calendar-horizontal {
+        gap: 6px;
+    }
+
+    .calendar-day-horizontal {
+        height: 30px;
+        font-size: 0.75rem;
+    }
+
+    .modal-normal {
+        max-width: 95%;
+    }
+}
+
 /* Tablet y móviles grandes (768px y menos) */
 @media (max-width: 768px) {
     .management-container {
