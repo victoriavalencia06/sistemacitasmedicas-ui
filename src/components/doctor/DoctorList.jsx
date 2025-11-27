@@ -2,7 +2,7 @@ import React from 'react';
 import { FaUserMd } from 'react-icons/fa';
 import DoctorItem from './DoctorItem';
 
-const DoctorList = ({ doctores, loading, onEdit, onDelete, onView }) => {
+const DoctorList = ({ doctores, loading, onEdit, onDelete, onActivate, onView }) => {
     if (loading) {
         return (
             <div className="management-loading">
@@ -29,7 +29,7 @@ const DoctorList = ({ doctores, loading, onEdit, onDelete, onView }) => {
             <div className="management-table-header">
                 <h2 className="management-table-title">Lista de Doctores</h2>
                 <p className="management-table-subtitle">
-                    {doctores.length} {doctores.length === 1 ? 'doctor registrado' : 'doctores registrados'}
+                    {doctores.length} {doctores.length === 1 ? 'doctor encontrado' : 'doctores encontrados'}
                 </p>
             </div>
 
@@ -39,7 +39,7 @@ const DoctorList = ({ doctores, loading, onEdit, onDelete, onView }) => {
                         <tr>
                             <th>ID</th>
                             <th>Nombre Completo</th>
-                            <th>Cédula Profesional</th>
+                            <th>Correo</th>
                             <th>Teléfono</th>
                             <th>Estado</th>
                             <th>Acciones</th>
@@ -52,6 +52,7 @@ const DoctorList = ({ doctores, loading, onEdit, onDelete, onView }) => {
                                 doctor={doctor}
                                 onEdit={onEdit}
                                 onDelete={onDelete}
+                                onActivate={onActivate}
                                 onView={onView}
                             />
                         ))}

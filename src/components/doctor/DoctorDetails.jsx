@@ -1,4 +1,3 @@
-// src/components/doctor/DoctorDetails.jsx
 import React, { useState, useEffect } from 'react';
 import {
     FaUserMd,
@@ -9,7 +8,9 @@ import {
     FaCalendarAlt,
     FaTimes,
     FaPlus,
-    FaTrash
+    FaTrash,
+    FaEnvelope,
+    FaUser
 } from 'react-icons/fa';
 import doctorEspecializacionService from '../../services/doctorEspecializacionService';
 import especializacionService from '../../services/especializacionService';
@@ -215,7 +216,7 @@ const DoctorDetails = ({ doctor, onClose }) => {
                             Detalles del Doctor
                         </h2>
                         <p className="management-form-subtitle mb-0">
-                            Información completa del doctor
+                            Información completa del doctor y su usuario
                         </p>
                     </div>
                     <button
@@ -230,7 +231,36 @@ const DoctorDetails = ({ doctor, onClose }) => {
 
             <div className="management-form">
                 <div className="row">
-                    {/* Información Personal */}
+                    {/* Información del Usuario */}
+                    <div className="col-md-6">
+                        <div className="detail-section">
+                            <h4 className="detail-section-title">
+                                <FaUser className="me-2" />
+                                Información de Usuario
+                            </h4>
+
+                            <div className="detail-item">
+                                <label><FaEnvelope className="me-1" /> Correo:</label>
+                                <span className="detail-value">{doctor.correo || 'No especificado'}</span>
+                            </div>
+
+                            <div className="detail-item">
+                                <label>ID de Usuario:</label>
+                                <span className="detail-value">#{doctor.idUsuario || 'No asignado'}</span>
+                            </div>
+
+                            <div className="detail-item">
+                                <label>Rol:</label>
+                                <span className="detail-value">
+                                    {doctor.idRol === 1 ? 'Administrador' : 
+                                     doctor.idRol === 2 ? 'Doctor' : 
+                                     `Rol ${doctor.idRol}`}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Información Personal del Doctor */}
                     <div className="col-md-6">
                         <div className="detail-section">
                             <h4 className="detail-section-title">
@@ -261,7 +291,9 @@ const DoctorDetails = ({ doctor, onClose }) => {
                             </div>
                         </div>
                     </div>
+                </div>
 
+                <div className="row mt-3">
                     {/* Información Profesional */}
                     <div className="col-md-6">
                         <div className="detail-section">
@@ -279,13 +311,6 @@ const DoctorDetails = ({ doctor, onClose }) => {
                                 <label>ID del Doctor:</label>
                                 <span className="detail-value">#{doctor.id}</span>
                             </div>
-
-                            {doctor.idUsuario && (
-                                <div className="detail-item">
-                                    <label>ID de Usuario:</label>
-                                    <span className="detail-value">#{doctor.idUsuario}</span>
-                                </div>
-                            )}
                         </div>
                     </div>
                 </div>

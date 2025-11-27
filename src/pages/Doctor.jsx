@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { FaPlus, FaSearch } from 'react-icons/fa';
+import { FaPlus, FaSearch, FaSync } from 'react-icons/fa';
 import DoctorList from '../components/doctor/DoctorList';
 import DoctorForm from '../components/doctor/DoctorForm';
 import DoctorDetails from '../components/doctor/DoctorDetails';
@@ -17,24 +17,35 @@ const Doctor = () => {
     const [showDetails, setShowDetails] = useState(false);
     const [editingDoctor, setEditingDoctor] = useState(null);
     const [selectedDoctor, setSelectedDoctor] = useState(null);
+    const [viewMode, setViewMode] = useState('all'); // 'all', 'active', 'inactive'
 
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(5);
 
+    // Filtrar doctores según el modo de vista y búsqueda
     const filteredDoctores = useMemo(() => {
         let result = [...doctores];
+        
+        // Filtrar por estado
+        if (viewMode === 'active') {
+            result = result.filter(d => d.estado);
+        } else if (viewMode === 'inactive') {
+            result = result.filter(d => !d.estado);
+        }
+
+        // Filtrar por búsqueda
         if (searchTerm.trim() !== '') {
             const searchLower = searchTerm.toLowerCase();
             result = result.filter(d =>
-                d.nombre.toLowerCase().includes(searchLower) ||
-                d.apellido.toLowerCase().includes(searchLower) ||
-                d.cedulaProfesional.toLowerCase().includes(searchLower) ||
-                d.telefono.toLowerCase().includes(searchLower)
+                d.nombre?.toLowerCase().includes(searchLower) ||
+                d.apellido?.toLowerCase().includes(searchLower) ||
+                d.telefono?.toLowerCase().includes(searchLower) ||
+                d.correo?.toLowerCase().includes(searchLower)
             );
         }
         return result;
-    }, [doctores, searchTerm]);
+    }, [doctores, searchTerm, viewMode]);
 
     const currentPageDoctores = useMemo(() => {
         const startIndex = (currentPage - 1) * itemsPerPage;
@@ -76,6 +87,8 @@ const Doctor = () => {
                     horario: d.horario ?? d.Horario ?? '',
                     estado: d.estado === 1 || d.estado === true || String(d.estado) === '1',
                     idUsuario: d.idUsuario ?? d.idusuario,
+                    correo: d.correo ?? d.Correo ?? '',
+                    idRol: d.idRol ?? d.idrol ?? 2,
                     doctorEspecializaciones: d.doctorEspecializaciones ?? d.especializaciones ?? [],
                     fechaRegistro: d.fechaRegistro,
                     fechaActualizacion: d.fechaActualizacion,
@@ -127,62 +140,89 @@ const Doctor = () => {
         if (!result.isConfirmed) return;
 
         try {
-            await doctorService.delete(id);
-            await loadDoctores();
-        } catch (err) { }
-    };
-
-    const handleFormSubmit = async (doctorData) => {
-        try {
-            // doctorData viene desde DoctorForm y debe contener:
-            // { nombre, apellido, cedulaProfesional, telefono, horario (ISO o null), estado (boolean) }
-
-            // Normalizar: asegurar horario ISO válido o null (backend requiere DateTime)
-            const horarioIso = doctorData.horario && doctorData.horario !== ''
-                ? new Date(doctorData.horario).toISOString()
-                : new Date().toISOString(); // si quieres forzar ahora porque el modelo exige Horario
-
-            // Asegurar telefono: quitar no dígitos y mantener 8 caracteres
-            const telefonoDigits = (doctorData.telefono ?? '').replace(/\D/g, '');
-            // opcional: si telefonoDigits.length !== 8, podrías mostrar error al usuario antes de enviar
-
-            // Construir payload en camelCase (el service espera estos nombres)
-            const payload = {
-                // Si el backend necesita idDoctor en el body al actualizar, lo añadimos más abajo
-                idUsuario: doctorData.idUsuario ?? doctorData.idusuario ?? (editingDoctor?.idUsuario ?? 0), // asegúrate de pasar currentUserId si corresponde
-                nombre: doctorData.nombre ?? '',
-                apellido: doctorData.apellido ?? '',
-                cedulaProfesional: doctorData.cedulaProfesional ?? '',
-                telefono: telefonoDigits,
-                horario: horarioIso,
-                estado: doctorData.estado ? 1 : 0,
-                DoctorEspecializaciones: doctorData.DoctorEspecializaciones ?? [] // si gestionas relaciones aquí
-            };
-
-            console.log('📥 payload preparado (handleFormSubmit):', payload, 'editingDoctorId:', editingDoctor?.id);
-
-            if (editingDoctor && editingDoctor.id) {
-                // incluye idDoctor en el body por si el backend lo espera
-                await doctorService.update(editingDoctor.id, { ...payload, idDoctor: editingDoctor.id });
-            } else {
-                // crear -> asegúrate enviar idUsuario válido (obtenlo del contexto/auth si aplica)
-                await doctorService.create(payload);
-            }
-
-            setShowForm(false);
-            setEditingDoctor(null);
+            await doctorService.desactivar(id);
             await loadDoctores();
         } catch (err) {
-            console.error('handleFormSubmit error:', err);
-            const apiData = err?.response?.data ?? err;
-            const message = apiData?.message || JSON.stringify(apiData) || 'Error al guardar';
-            Swal.fire('Error', message, 'error');
+            // Error ya manejado en el servicio
         }
     };
 
+    const handleActivate = async (id) => {
+        const result = await Swal.fire({
+            title: '¿Activar doctor?',
+            text: "El doctor podrá ser asignado a nuevas citas.",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, activar',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true
+        });
+
+        if (!result.isConfirmed) return;
+
+        try {
+            await doctorService.activar(id);
+            await loadDoctores();
+        } catch (err) {
+            // Error ya manejado en el servicio
+        }
+    };
+
+const handleFormSubmit = async (doctorData) => {
+    try {
+        // Normalizar datos para el nuevo endpoint
+        const horarioIso = doctorData.horario && doctorData.horario !== ''
+            ? new Date(doctorData.horario).toISOString()
+            : new Date().toISOString();
+
+        const telefonoDigits = (doctorData.telefono ?? '').replace(/\D/g, '');
+
+        // Construir payload para doctor completo - SIN idRol
+        const payload = {
+            // Datos del usuario
+            correo: doctorData.correo ?? '',
+            password: doctorData.password ?? '',
+            
+            // Datos del doctor
+            nombre: doctorData.nombre ?? '',
+            apellido: doctorData.apellido ?? '',
+            cedulaProfesional: doctorData.cedulaProfesional ?? '',
+            telefono: telefonoDigits,
+            horario: horarioIso
+        };
+
+        // Para actualización, incluir IDs
+        if (editingDoctor && editingDoctor.id) {
+            payload.idDoctor = editingDoctor.id;
+            payload.idUsuario = editingDoctor.idUsuario;
+            
+            // Solo enviar password si se proporcionó uno nuevo
+            if (!doctorData.password) {
+                delete payload.password;
+            }
+        }
+
+        console.log('📥 Payload FINAL para backend:', payload);
+
+        if (editingDoctor && editingDoctor.id) {
+            await doctorService.update(editingDoctor.id, payload);
+        } else {
+            await doctorService.create(payload);
+        }
+
+        setShowForm(false);
+        setEditingDoctor(null);
+        await loadDoctores();
+    } catch (err) {
+        console.error('handleFormSubmit error:', err);
+        // Error ya manejado en el servicio
+    }
+};
 
     const handleCancel = () => {
-        if (editingDoctor?.nombre) {
+        if (editingDoctor?.nombre || (editingDoctor === null && showForm)) {
             Swal.fire({
                 title: '¿Estás seguro de salir?',
                 text: 'Los cambios no guardados se perderán',
@@ -220,53 +260,76 @@ const Doctor = () => {
         setCurrentPage(1);
     };
 
+    const handleViewModeChange = (mode) => {
+        setViewMode(mode);
+        setCurrentPage(1);
+    };
+
+    const activeCount = doctores.filter(d => d.estado).length;
+    const inactiveCount = doctores.filter(d => !d.estado).length;
+
     return (
         <div className="management-container">
             <div className="management-header">
                 <h1 className="management-title">Gestión de Doctores</h1>
-                {!showForm && !showDetails && (
-                    <button onClick={handleCreate} className="btn-management">
-                        <FaPlus style={{ marginRight: 6 }} /> Nuevo Doctor
+                <div className="management-actions">
+                    <button onClick={loadDoctores} className="btn-management btn-management-secondary">
+                        <FaSync style={{ marginRight: 6 }} /> Actualizar
                     </button>
-                )}
+                    {!showForm && !showDetails && (
+                        <button onClick={handleCreate} className="btn-management">
+                            <FaPlus style={{ marginRight: 6 }} /> Nuevo Doctor
+                        </button>
+                    )}
+                </div>
             </div>
 
             {!showForm && !showDetails && (
-                <div className="management-filters">
-                    <div className="search-input">
-                        <FaSearch className="search-icon" />
-                        <input
-                            type="text"
-                            placeholder="Buscar por nombre, apellido, cédula o teléfono..."
-                            value={searchTerm}
-                            onChange={(e) => handleSearchChange(e.target.value)}
-                        />
-                    </div>
-                </div>
-            )}
-
-            <AlertMessage type="error" message={error} />
-
-            {showForm ? (
-                <DoctorForm
-                    doctor={editingDoctor}
-                    onSubmit={handleFormSubmit}
-                    onCancel={handleCancel}
-                />
-            ) : showDetails ? (
-                <DoctorDetails
-                    doctor={selectedDoctor}
-                    onClose={handleCloseDetails}
-                />
-            ) : (
                 <>
+                    <div className="management-filters">
+                        <div className="search-input">
+                            <FaSearch className="search-icon" />
+                            <input
+                                type="text"
+                                placeholder="Buscar por nombre, apellido, teléfono o correo..."
+                                value={searchTerm}
+                                onChange={(e) => handleSearchChange(e.target.value)}
+                            />
+                        </div>
+                        
+                        <div className="view-mode-buttons">
+                            <button 
+                                className={`btn-mode ${viewMode === 'all' ? 'active' : ''}`}
+                                onClick={() => handleViewModeChange('all')}
+                            >
+                                Todos ({doctores.length})
+                            </button>
+                            <button 
+                                className={`btn-mode ${viewMode === 'active' ? 'active' : ''}`}
+                                onClick={() => handleViewModeChange('active')}
+                            >
+                                Activos ({activeCount})
+                            </button>
+                            <button 
+                                className={`btn-mode ${viewMode === 'inactive' ? 'active' : ''}`}
+                                onClick={() => handleViewModeChange('inactive')}
+                            >
+                                Inactivos ({inactiveCount})
+                            </button>
+                        </div>
+                    </div>
+
+                    <AlertMessage type="error" message={error} />
+
                     <DoctorList
                         doctores={currentPageDoctores}
                         loading={loading}
                         onEdit={handleEdit}
                         onDelete={handleDelete}
+                        onActivate={handleActivate}
                         onView={handleView}
                     />
+                    
                     {totalPages > 1 && (
                         <Pagination
                             currentPage={currentPage}
@@ -277,6 +340,21 @@ const Doctor = () => {
                         />
                     )}
                 </>
+            )}
+
+            {showForm && (
+                <DoctorForm
+                    doctor={editingDoctor}
+                    onSubmit={handleFormSubmit}
+                    onCancel={handleCancel}
+                />
+            )}
+
+            {showDetails && (
+                <DoctorDetails
+                    doctor={selectedDoctor}
+                    onClose={handleCloseDetails}
+                />
             )}
         </div>
     );

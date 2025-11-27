@@ -8,6 +8,7 @@ function extractValidationMessages(apiData) {
 
     if (!errors) {
         if (apiData?.message) msgs.push(apiData.message);
+        if (apiData?.error) msgs.push(apiData.error); // Para errores del controlador
         return msgs;
     }
 
@@ -23,33 +24,46 @@ const doctorService = {
     // Obtener todos los doctores
     getAll: async () => {
         try {
-            const response = await api.get('/doctor/getAll');
+            const response = await api.get('/doctor-completo');
             return response.data;
         } catch (error) {
             throw error.response?.data || new Error('Error al obtener doctores');
         }
     },
 
+    // Obtener doctores activos
+    getActivos: async () => {
+        try {
+            const response = await api.get('/doctor-completo/activos');
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || new Error('Error al obtener doctores activos');
+        }
+    },
+
     // Obtener un doctor por ID
     getById: async (id) => {
         try {
-            const response = await api.get(`/doctor/get/${id}`);
+            const response = await api.get(`/doctor-completo/${id}`);
             return response.data;
         } catch (error) {
             throw error.response?.data || new Error('Error al obtener el doctor');
         }
     },
 
-    // Crear nuevo doctor
+    // Crear nuevo doctor completo
     create: async (doctorData) => {
         try {
-            const dataToSend = {
-                ...doctorData
-            };
-
-            const response = await api.post('/doctor/create', dataToSend, {
+            console.log('🚀 ENVIANDO CREATE - Datos:', doctorData);
+            
+            // Limpiar el payload - NO enviar idRol
+            const { idRol, ...cleanData } = doctorData;
+            
+            const response = await api.post('/doctor-completo/create', cleanData, {
                 headers: { 'Content-Type': 'application/json' }
             });
+
+            console.log('✅ CREATE EXITOSO - Respuesta:', response.data);
 
             await Swal.fire({
                 icon: 'success',
@@ -61,6 +75,12 @@ const doctorService = {
 
             return response.data;
         } catch (error) {
+            console.error('❌ CREATE ERROR - Detalles:', {
+                status: error.response?.status,
+                data: error.response?.data,
+                config: error.config
+            });
+
             const apiData = error.response?.data;
             const msgs = extractValidationMessages(apiData);
             const display = msgs.length
@@ -70,23 +90,27 @@ const doctorService = {
             await Swal.fire({
                 icon: 'error',
                 title: 'Error al crear doctor',
-                text: display
+                text: display,
+                width: '600px'
             });
 
             throw apiData || new Error(display);
         }
     },
 
-    // Actualizar doctor
+    // Actualizar doctor completo
     update: async (id, doctorData) => {
         try {
-            const dataToSend = {
-                ...doctorData
-            };
-
-            const response = await api.put(`/doctor/update/${id}`, dataToSend, {
+            console.log('🚀 ENVIANDO UPDATE - ID:', id, 'Datos:', doctorData);
+            
+            // Limpiar el payload - NO enviar idRol
+            const { idRol, ...cleanData } = doctorData;
+            
+            const response = await api.put('/doctor-completo/update', cleanData, {
                 headers: { 'Content-Type': 'application/json' }
             });
+
+            console.log('✅ UPDATE EXITOSO - Respuesta:', response.data);
 
             await Swal.fire({
                 icon: 'success',
@@ -98,6 +122,12 @@ const doctorService = {
 
             return response.data;
         } catch (error) {
+            console.error('❌ UPDATE ERROR - Detalles:', {
+                status: error.response?.status,
+                data: error.response?.data,
+                config: error.config
+            });
+
             const apiData = error.response?.data;
             const msgs = extractValidationMessages(apiData);
             const display = msgs.length
@@ -107,22 +137,23 @@ const doctorService = {
             await Swal.fire({
                 icon: 'error',
                 title: 'Error al actualizar doctor',
-                text: display
+                text: display,
+                width: '600px'
             });
 
             throw apiData || new Error(display);
         }
     },
 
-    // Eliminar doctor
-    delete: async (id) => {
+    // Desactivar doctor completo
+    desactivar: async (id) => {
         try {
-            const response = await api.delete(`/doctor/delete/${id}`);
+            const response = await api.put(`/doctor-completo/desactivar/${id}`);
 
             await Swal.fire({
                 icon: 'success',
-                title: 'Eliminado',
-                text: 'El doctor fue eliminado',
+                title: 'Desactivado',
+                text: 'El doctor fue desactivado',
                 timer: 1200,
                 showConfirmButton: false
             });
@@ -133,11 +164,38 @@ const doctorService = {
 
             await Swal.fire({
                 icon: 'error',
-                title: 'Error al eliminar doctor',
-                text: apiData?.message || 'No se pudo eliminar el doctor'
+                title: 'Error al desactivar doctor',
+                text: apiData?.message || 'No se pudo desactivar el doctor'
             });
 
-            throw apiData || new Error('Error al eliminar doctor');
+            throw apiData || new Error('Error al desactivar doctor');
+        }
+    },
+
+    // Activar doctor completo
+    activar: async (id) => {
+        try {
+            const response = await api.put(`/doctor-completo/activar/${id}`);
+
+            await Swal.fire({
+                icon: 'success',
+                title: 'Activado',
+                text: 'El doctor fue activado',
+                timer: 1200,
+                showConfirmButton: false
+            });
+
+            return response.data;
+        } catch (error) {
+            const apiData = error.response?.data;
+
+            await Swal.fire({
+                icon: 'error',
+                title: 'Error al activar doctor',
+                text: apiData?.message || 'No se pudo activar el doctor'
+            });
+
+            throw apiData || new Error('Error al activar doctor');
         }
     }
 };

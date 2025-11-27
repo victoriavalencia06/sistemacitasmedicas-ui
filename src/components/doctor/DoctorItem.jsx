@@ -1,7 +1,7 @@
 import React from 'react';
-import { FaUserMd, FaEdit, FaTrash, FaEye } from 'react-icons/fa';
+import { FaUserMd, FaEdit, FaTrash, FaEye, FaCheckCircle } from 'react-icons/fa';
 
-const DoctorItem = ({ doctor, onEdit, onDelete, onView }) => {
+const DoctorItem = ({ doctor, onEdit, onDelete, onActivate, onView }) => {
     return (
         <tr>
             <td>
@@ -16,7 +16,7 @@ const DoctorItem = ({ doctor, onEdit, onDelete, onView }) => {
                 </div>
             </td>
             <td>
-                {doctor.cedulaProfesional || 'No especificada'}
+                {doctor.correo || 'No especificado'}
             </td>
             <td>
                 {doctor.telefono || 'No especificado'}
@@ -43,13 +43,23 @@ const DoctorItem = ({ doctor, onEdit, onDelete, onView }) => {
                         <FaEdit />
                         Editar
                     </button>
-                    <button
-                        onClick={() => onDelete(doctor.id)}
-                        className="btn-management btn-management-danger"
-                    >
-                        <FaTrash />
-                        Desactivar
-                    </button>
+                    {doctor.estado ? (
+                        <button
+                            onClick={() => onDelete(doctor.id)}
+                            className="btn-management btn-management-danger"
+                        >
+                            <FaTrash />
+                            Desactivar
+                        </button>
+                    ) : (
+                        <button
+                            onClick={() => onActivate(doctor.id)}
+                            className="btn-management btn-management-success"
+                        >
+                            <FaCheckCircle />
+                            Activar
+                        </button>
+                    )}
                 </div>
             </td>
         </tr>
