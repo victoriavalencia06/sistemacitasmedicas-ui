@@ -23,13 +23,11 @@ const Citas = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(5);
 
-    // Cargar datos al montar
     useEffect(() => {
         loadCitas();
         loadDatosFormulario();
     }, []);
 
-    // Cargar usuarios, doctores y pacientes
     const loadDatosFormulario = async () => {
         try {
             const [usuariosData, doctoresData, pacientesData] = await Promise.all([
@@ -37,43 +35,30 @@ const Citas = () => {
                 citaService.getDoctoresActivos(),
                 citaService.getPacientesActivos()
             ]);
-            
+
             setUsuarios(usuariosData);
             setDoctores(doctoresData);
             setPacientes(pacientesData);
-            
-            console.log('📊 Datos cargados:', {
-                usuarios: usuariosData,
-                doctores: doctoresData,
-                pacientes: pacientesData
-            });
         } catch (error) {
             console.error('❌ Error al cargar datos del formulario:', error);
             Swal.fire('Error', 'No se pudieron cargar los datos del formulario', 'error');
         }
     };
 
-    // Filtrar citas
     const filteredCitas = useMemo(() => {
         let result = [...citas];
-        
         if (searchTerm.trim() !== '') {
             result = result.filter(c =>
                 String(c.pacienteNombre).toLowerCase().includes(searchTerm.toLowerCase()) ||
                 String(c.doctorNombre).toLowerCase().includes(searchTerm.toLowerCase())
             );
         }
-
         if (filterEstado !== 'todas') {
-            result = result.filter(c => 
-                c.estadoDisplay.toLowerCase() === filterEstado.toLowerCase()
-            );
+            result = result.filter(c => c.estadoDisplay.toLowerCase() === filterEstado.toLowerCase());
         }
-        
         return result;
     }, [citas, searchTerm, filterEstado]);
 
-    // Paginación
     const currentPageCitas = useMemo(() => {
         const startIndex = (currentPage - 1) * itemsPerPage;
         const endIndex = startIndex + itemsPerPage;
@@ -96,26 +81,24 @@ const Citas = () => {
             const data = await citaService.getAll();
             const rawList = Array.isArray(data) ? data : (data.items || []);
 
-            console.log('📥 Datos crudos de la API:', rawList);
-
-            // Mapeo MEJORADO para guardar más información
             const mapped = rawList.map((c) => ({
-                id: c.idCita,
-                idCita: c.idCita,
-                pacienteNombre: c.paciente || 'Sin paciente',
-                doctorNombre: c.doctor || 'Sin doctor',
-                // Guardar información adicional para edición
-                usuarioNombre: c.usuario || '', // Si está disponible
-                idUsuario: c.idUsuario, // Si está disponible
-                idPaciente: c.idPaciente, // Si está disponible  
-                idDoctor: c.idDoctor, // Si está disponible
-                fechaHora: c.fechaHora ? new Date(c.fechaHora).toLocaleString() : 'Sin fecha',
-                fechaHoraOriginal: c.fechaHora, // Guardar para edición
-                estado: c.estado,
-                estadoDisplay: c.estado ? 'Activa' : 'Cancelada'
+                id: c.idCita || c.IdCita,
+                idCita: c.idCita || c.IdCita,
+                pacienteNombre: c.paciente || c.Paciente || 'Sin paciente',
+                doctorNombre: c.doctor || c.Doctor || 'Sin doctor',
+                usuarioNombre: c.usuario || c.Usuario || '',
+                idUsuario: c.idUsuario || c.IdUsuario,
+                idPaciente: c.idPaciente || c.IdPaciente,
+                idDoctor: c.idDoctor || c.IdDoctor,
+                fechaHora: c.fechaHora || c.FechaHora || '',
+                fechaHoraOriginal: c.fechaHora || c.FechaHora || '',
+                estado: (c.estado !== undefined ? c.estado : c.Estado),
+                estadoDisplay: (c.estado !== undefined ? (c.estado ? 'Activa' : 'Cancelada') : (c.Estado ? 'Activa' : 'Cancelada'))
             }));
 
-            console.log('🔄 Citas mapeadas:', mapped);
+            // ✅ Ordenar por idCita ascendente
+            mapped.sort((a, b) => a.idCita - b.idCita);
+
             setCitas(mapped);
         } catch (err) {
             const errorMessage = err?.message || 'Error al cargar las citas';
@@ -127,100 +110,46 @@ const Citas = () => {
     };
 
     const handleCreate = () => {
-        console.log('🆕 Creando nueva cita - reiniciando estado');
         setEditingCita(null);
         setShowForm(true);
     };
 
     const handleEdit = async (cita) => {
         try {
-            console.log('✏️ Preparando cita para editar ID:', cita.idCita);
-            console.log('📋 Datos de la cita recibida:', cita);
-            console.log('👥 Datos disponibles:', {
-                usuarios: usuarios.length,
-                pacientes: pacientes.length, 
-                doctores: doctores.length
-            });
-
-            // 🔍 Estrategia 1: Buscar por ID directo si está disponible
-            let usuarioId = '';
-            let pacienteId = '';
-            let doctorId = '';
-
-            // Si la cita ya tiene IDs, usarlos directamente
-            if (cita.idUsuario) {
-                usuarioId = cita.idUsuario.toString();
-            } else {
-                // Buscar por nombre en usuarios
-                const usuarioEncontrado = usuarios.find(u => 
-                    u.nombre && cita.usuarioNombre && 
-                    u.nombre.toLowerCase().includes(cita.usuarioNombre.toLowerCase().split(' ')[0])
-                );
-                usuarioId = usuarioEncontrado?.idUsuario?.toString() || '';
-            }
-
-            if (cita.idPaciente) {
-                pacienteId = cita.idPaciente.toString();
-            } else {
-                // Buscar por nombre en pacientes
-                const pacienteEncontrado = pacientes.find(p => 
-                    p.nombre && cita.pacienteNombre && 
-                    p.nombre.toLowerCase().includes(cita.pacienteNombre.toLowerCase().split(' ')[0])
-                );
-                pacienteId = pacienteEncontrado?.idPaciente?.toString() || '';
-            }
-
-            if (cita.idDoctor) {
-                doctorId = cita.idDoctor.toString();
-            } else {
-                // Buscar por nombre en doctores
-                const doctorEncontrado = doctores.find(d => 
-                    d.nombre && cita.doctorNombre && 
-                    d.nombre.toLowerCase().includes(cita.doctorNombre.toLowerCase().split(' ')[0])
-                );
-                doctorId = doctorEncontrado?.idDoctor?.toString() || '';
-            }
-
-            console.log('🎯 IDs encontrados:', { usuarioId, pacienteId, doctorId });
+            const fechaParaInput = citaService.isoToDatetimeLocalInput
+                ? citaService.isoToDatetimeLocalInput(cita.fechaHoraOriginal || cita.fechaHora)
+                : (cita.fechaHoraOriginal ? new Date(cita.fechaHoraOriginal).toISOString().slice(0,16) : (cita.fechaHora ? new Date(cita.fechaHora).toISOString().slice(0,16) : ''));
 
             const citaParaEditar = {
                 id: cita.idCita,
                 idCita: cita.idCita,
-                idUsuario: usuarioId,
-                idPaciente: pacienteId,
-                idDoctor: doctorId,
-                fechaHora: cita.fechaHoraOriginal ? 
-                    new Date(cita.fechaHoraOriginal).toISOString().slice(0, 16) : 
-                    (cita.fechaHora ? new Date(cita.fechaHora).toISOString().slice(0, 16) : ''),
+                idUsuario: (cita.idUsuario || cita.IdUsuario || '')?.toString() || '',
+                idPaciente: (cita.idPaciente || cita.IdPaciente || '')?.toString() || '',
+                idDoctor: (cita.idDoctor || cita.IdDoctor || '')?.toString() || '',
+                fechaHora: fechaParaInput,
                 fechaHoraOriginal: cita.fechaHoraOriginal || cita.fechaHora,
                 estado: cita.estado
             };
 
-            console.log('✅ Cita preparada para edición:', citaParaEditar);
             setEditingCita(citaParaEditar);
             setShowForm(true);
-            
+
         } catch (err) {
             console.error('❌ Error al preparar cita para editar:', err);
-            
-            // 🔄 Último fallback: Dejar los campos vacíos pero mostrar la cita
             const citaParaEditar = {
                 id: cita.idCita,
                 idCita: cita.idCita,
                 idUsuario: '',
                 idPaciente: '',
                 idDoctor: '',
-                fechaHora: cita.fechaHoraOriginal ? 
-                    new Date(cita.fechaHoraOriginal).toISOString().slice(0, 16) : 
-                    (cita.fechaHora ? new Date(cita.fechaHora).toISOString().slice(0, 16) : ''),
+                fechaHora: cita.fechaHoraOriginal ? new Date(cita.fechaHoraOriginal).toISOString().slice(0, 16) : (cita.fechaHora ? new Date(cita.fechaHora).toISOString().slice(0, 16) : ''),
                 fechaHoraOriginal: cita.fechaHoraOriginal || cita.fechaHora,
                 estado: cita.estado
             };
 
-            console.log('⚠️ Cita preparada con campos vacíos:', citaParaEditar);
             setEditingCita(citaParaEditar);
             setShowForm(true);
-            
+
             Swal.fire({
                 icon: 'warning',
                 title: 'Información incompleta',
@@ -232,10 +161,10 @@ const Citas = () => {
 
     const handleDelete = async (id) => {
         const citaAEliminar = citas.find(c => c.idCita === id);
-        
+
         const result = await Swal.fire({
             title: '¿Estás seguro de eliminar esta cita?',
-            html: citaAEliminar ? 
+            html: citaAEliminar ?
                 `Vas a eliminar la cita de <strong>${citaAEliminar.pacienteNombre}</strong> con el doctor <strong>${citaAEliminar.doctorNombre}</strong>` :
                 'Vas a eliminar esta cita',
             icon: 'warning',
@@ -252,7 +181,7 @@ const Citas = () => {
         try {
             await citaService.delete(id);
             await loadCitas();
-            
+
             Swal.fire({
                 icon: 'success',
                 title: 'Eliminada',
@@ -268,24 +197,18 @@ const Citas = () => {
 
     const handleFormSubmit = async (citaData) => {
         try {
-            console.log('📝 Datos recibidos del formulario:', citaData);
-
-            // Enviar datos directamente al servicio
             if (editingCita && editingCita.idCita) {
-                console.log(`🔄 Actualizando cita ID: ${editingCita.idCita}`);
                 await citaService.update(editingCita.idCita, citaData);
             } else {
-                console.log('🆕 Creando nueva cita');
                 await citaService.create(citaData);
             }
 
             setShowForm(false);
             setEditingCita(null);
             await loadCitas();
-            
+
         } catch (err) {
             console.error('❌ Error en handleFormSubmit:', err);
-            // El error ya se maneja en el servicio con SweetAlert
         }
     };
 
@@ -361,9 +284,9 @@ const Citas = () => {
             <AlertMessage type="error" message={error} />
 
             {showForm ? (
-                <CitaForm 
-                    cita={editingCita} 
-                    onSubmit={handleFormSubmit} 
+                <CitaForm
+                    cita={editingCita}
+                    onSubmit={handleFormSubmit}
                     onCancel={handleCancel}
                     usuarios={usuarios}
                     doctores={doctores}

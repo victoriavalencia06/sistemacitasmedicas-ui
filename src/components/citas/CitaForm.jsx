@@ -1,46 +1,51 @@
 import React, { useState, useEffect } from 'react';
 import { FaCalendarAlt, FaSave, FaPlus, FaTimes, FaExclamationCircle, FaInfoCircle, FaClock } from 'react-icons/fa';
+import citaService from '../../services/citaService'; // si necesitas la utilidad isoToDatetimeLocalInput directamente
 
 const CitaForm = ({ cita, onSubmit, onCancel, usuarios, doctores, pacientes }) => {
     const [formData, setFormData] = useState({
         idUsuario: '',
         idPaciente: '',
         idDoctor: '',
-        fechaHora: '', // Nuevo campo para fecha y hora
+        fechaHora: '', // valor para input datetime-local (YYYY-MM-DDTHH:mm)
         estado: true
     });
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
 
+    // Utilidad: convierte ISO (backend) -> valor para input datetime-local (local)
+    const isoToDatetimeLocalInput = (isoString) => {
+        if (!isoString) return '';
+        const d = new Date(isoString);
+        const tzOffset = d.getTimezoneOffset() * 60000;
+        const local = new Date(d.getTime() - tzOffset);
+        return local.toISOString().slice(0, 16);
+    };
+
+    // Utilidad: obtener ahora en formato local para datetime-local
+    const nowLocalForInput = () => {
+        const d = new Date();
+        const tzOffset = d.getTimezoneOffset() * 60000;
+        const local = new Date(d.getTime() - tzOffset);
+        return local.toISOString().slice(0, 16);
+    };
+
     useEffect(() => {
         if (cita) {
-            console.log('📋 Cita recibida para editar:', cita);
-            
-            // Formatear la fecha para el input datetime-local
-            const formatDateForInput = (dateString) => {
-                if (!dateString) return '';
-                const date = new Date(dateString);
-                return date.toISOString().slice(0, 16);
-            };
-
+            // si cita trae fecha (ISO del backend), convertir a valor local para el input
             setFormData({
                 idUsuario: cita.idUsuario?.toString() || '',
                 idPaciente: cita.idPaciente?.toString() || '',
                 idDoctor: cita.idDoctor?.toString() || '',
-                fechaHora: formatDateForInput(cita.fechaHora), // Usar la fecha de la cita
-                estado: cita.estado ?? true
+                fechaHora: isoToDatetimeLocalInput(cita.fechaHora || cita.fechaHoraOriginal),
+                estado: (cita.estado === 1 || cita.estado === true) ? true : false
             });
         } else {
-            console.log('🆕 Creando nueva cita - formulario vacío');
-            // Establecer fecha y hora actual por defecto
-            const now = new Date();
-            const defaultDateTime = now.toISOString().slice(0, 16);
-            
             setFormData({
                 idUsuario: '',
                 idPaciente: '',
                 idDoctor: '',
-                fechaHora: defaultDateTime, // Fecha y hora actual por defecto
+                fechaHora: nowLocalForInput(),
                 estado: true
             });
         }
@@ -60,61 +65,45 @@ const CitaForm = ({ cita, onSubmit, onCancel, usuarios, doctores, pacientes }) =
 
     const validateForm = () => {
         const newErrors = {};
-        
-        if (!formData.idUsuario) {
-            newErrors.idUsuario = 'Debe seleccionar un usuario';
-        }
-        
-        if (!formData.idPaciente) {
-            newErrors.idPaciente = 'Debe seleccionar un paciente';
-        }
-        
-        if (!formData.idDoctor) {
-            newErrors.idDoctor = 'Debe seleccionar un doctor';
-        }
-        
-        // Validar fecha y hora
-        if (!formData.fechaHora) {
-            newErrors.fechaHora = 'Debe seleccionar fecha y hora';
-        } else {
+
+        if (!formData.idUsuario) newErrors.idUsuario = 'Debe seleccionar un usuario';
+        if (!formData.idPaciente) newErrors.idPaciente = 'Debe seleccionar un paciente';
+        if (!formData.idDoctor) newErrors.idDoctor = 'Debe seleccionar un doctor';
+        if (!formData.fechaHora) newErrors.fechaHora = 'Debe seleccionar fecha y hora';
+        else {
+            // Comprobación básica: no permitir fecha en pasado (comparando instantes)
             const selectedDate = new Date(formData.fechaHora);
             const now = new Date();
-            
-            // Validar que la fecha no sea en el pasado
-            if (selectedDate < now) {
-                newErrors.fechaHora = 'No puede seleccionar una fecha y hora pasadas';
-            }
+            // selectedDate here is parsed as local; compare against now local
+            if (selectedDate < now) newErrors.fechaHora = 'No puede seleccionar una fecha y hora pasadas';
         }
-        
+
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('✅ Formulario enviado, validando...');
-        
-        if (!validateForm()) {
-            console.log('❌ Validación fallida, errores:', errors);
-            return;
-        }
+
+        if (!validateForm()) return;
 
         const payload = {
             idUsuario: formData.idUsuario,
             idPaciente: formData.idPaciente,
             idDoctor: formData.idDoctor,
-            fechaHora: formData.fechaHora, // Incluir la fecha seleccionada
+            fechaHora: formData.fechaHora, // valor local "YYYY-MM-DDTHH:mm"; service lo convertirá a UTC ISO
             estado: formData.estado
         };
 
-        // Si estamos editando, incluir la fecha original si es necesario
-        if (cita && cita.fechaHoraOriginal) {
-            payload.fechaHoraOriginal = cita.fechaHoraOriginal;
-        }
+        // si edicion, incluir fechaHoraOriginal si existe
+        if (cita && cita.fechaHoraOriginal) payload.fechaHoraOriginal = cita.fechaHoraOriginal;
 
-        console.log('📦 Payload a enviar:', payload);
-        
-        onSubmit(payload);
+        setLoading(true);
+        try {
+            await onSubmit(payload);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -127,7 +116,7 @@ const CitaForm = ({ cita, onSubmit, onCancel, usuarios, doctores, pacientes }) =
                 <p className="management-form-subtitle">
                     {cita ? 'Modifica los datos de la cita seleccionada' : 'Completa la información para agendar una nueva cita'}
                 </p>
-                
+
                 <div className="info-alert">
                     <FaInfoCircle style={{ marginRight: 8, color: '#1890ff' }} />
                     <strong>Nota:</strong> Seleccione la fecha y hora deseada para la cita.
@@ -209,7 +198,6 @@ const CitaForm = ({ cita, onSubmit, onCancel, usuarios, doctores, pacientes }) =
                     </div>
                 </div>
 
-                {/* NUEVO CAMPO PARA FECHA Y HORA */}
                 <div className="form-group">
                     <label htmlFor="fechaHora" className="form-label required">
                         <FaClock style={{ marginRight: 6 }} />
@@ -222,7 +210,7 @@ const CitaForm = ({ cita, onSubmit, onCancel, usuarios, doctores, pacientes }) =
                         value={formData.fechaHora}
                         onChange={handleChange}
                         className={`form-control ${errors.fechaHora ? 'error' : ''}`}
-                        min={new Date().toISOString().slice(0, 16)} // No permitir fechas pasadas
+                        min={nowLocalForInput()}
                     />
                     {errors.fechaHora && (
                         <div className="form-error">
