@@ -10,7 +10,8 @@ import {
   FaClipboardList,
   FaUsersCog,
   FaStethoscope,
-  FaSpinner
+  FaSpinner,
+  FaNotesMedical
 } from "react-icons/fa";
 import { AuthContext } from "../../context/AuthContext";
 
@@ -28,7 +29,8 @@ const menuIcons = {
   'Roles': FaUsersCog,
   'Especializaciones': FaStethoscope,
   'Usuarios': FaUsersCog,
-  'Configuración': FaCog
+  'Configuración': FaCog,
+  'Historial Médico': FaNotesMedical
 };
 
 export default function Sidebar({
@@ -69,41 +71,45 @@ export default function Sidebar({
     }
   }, [userPermissions, user?.rol]);
 
-  const getDefaultMenu = (userRole) => {
+const getDefaultMenu = (userRole) => {
     const roleMenus = {
-      "1": [
-        { id: "dashboard", label: "Dashboard", icon: FaChartBar },
-        { id: "citas", label: "Citas", icon: FaCalendar },
-        { id: "pacientes", label: "Pacientes", icon: FaUser },
-        { id: "medicos", label: "Médicos", icon: FaUserMd },
-        { id: "reportes", label: "Reportes", icon: FaClipboardList },
-        { id: "notificaciones", label: "Notificaciones", icon: FaBell },
-        { id: "roles", label: "Roles", icon: FaUsersCog },
-        { id: "especializaciones", label: "Especializaciones", icon: FaStethoscope },
-        { id: "usuarios", label: "Usuarios", icon: FaUsersCog }
-      ],
-      "2": [
-        { id: "dashboard", label: "Dashboard", icon: FaChartBar },
-        { id: "citas", label: "Citas", icon: FaCalendar },
-        { id: "pacientes", label: "Mis Pacientes", icon: FaUser },
-        { id: "notificaciones", label: "Notificaciones", icon: FaBell }
-      ],
-      "3": [
-        { id: "perfil", label: "Mi Perfil", icon: FaUser },
-        { id: "agendar-cita", label: "Agendar Cita", icon: FaCalendar },
-        { id: "mis-citas", label: "Mis Citas", icon: FaHeart },
-        { id: "notificaciones", label: "Notificaciones", icon: FaBell }
-      ],
-      "6": [
-        { id: "dashboard", label: "Dashboard", icon: FaChartBar },
-        { id: "citas", label: "Citas", icon: FaCalendar },
-        { id: "pacientes", label: "Pacientes", icon: FaUser },
-        { id: "notificaciones", label: "Notificaciones", icon: FaBell }
-      ]
+        "1": [ // Administrador
+            { id: "dashboard", label: "Dashboard", icon: FaChartBar },
+            { id: "citas", label: "Citas", icon: FaCalendar },
+            { id: "pacientes", label: "Pacientes", icon: FaUser },
+            { id: "medicos", label: "Médicos", icon: FaUserMd },
+            { id: "historial-medico", label: "Historial Médico", icon: FaNotesMedical }, // ← NUEVO
+            { id: "reportes", label: "Reportes", icon: FaClipboardList },
+            { id: "notificaciones", label: "Notificaciones", icon: FaBell },
+            { id: "roles", label: "Roles", icon: FaUsersCog },
+            { id: "especializaciones", label: "Especializaciones", icon: FaStethoscope },
+            { id: "usuarios", label: "Usuarios", icon: FaUsersCog }
+        ],
+        "2": [ // Doctor
+            { id: "dashboard", label: "Dashboard", icon: FaChartBar },
+            { id: "citas", label: "Citas", icon: FaCalendar },
+            { id: "pacientes", label: "Mis Pacientes", icon: FaUser },
+            { id: "historial-medico", label: "Historial Médico", icon: FaNotesMedical }, // ← NUEVO
+            { id: "notificaciones", label: "Notificaciones", icon: FaBell }
+        ],
+        "3": [ // Paciente
+            { id: "perfil", label: "Mi Perfil", icon: FaUser },
+            { id: "agendar-cita", label: "Agendar Cita", icon: FaCalendar },
+            { id: "mis-citas", label: "Mis Citas", icon: FaHeart },
+            { id: "historial-medico", label: "Mi Historial", icon: FaNotesMedical }, // ← NUEVO (nombre diferente para paciente)
+            { id: "notificaciones", label: "Notificaciones", icon: FaBell }
+        ],
+        "6": [ // Secretaria
+            { id: "dashboard", label: "Dashboard", icon: FaChartBar },
+            { id: "citas", label: "Citas", icon: FaCalendar },
+            { id: "pacientes", label: "Pacientes", icon: FaUser },
+            { id: "historial-medico", label: "Historial Médico", icon: FaNotesMedical }, // ← NUEVO
+            { id: "notificaciones", label: "Notificaciones", icon: FaBell }
+        ]
     };
 
     return roleMenus[userRole] || [{ id: "dashboard", label: "Dashboard", icon: FaChartBar }];
-  };
+};
 
   const roleNames = {
     "1": "Administrador",

@@ -17,6 +17,7 @@ import Pacientes from '../pages/Pacientes';
 import Citas from '../pages/Citas';
 import Usuarios from '../pages/Usuarios';
 import Doctor from '../pages/Doctor';
+import HistorialMedico from '../pages/HistorialMedico';
 
 function Dashboard() {
     const [currentScreen, setCurrentScreen] = React.useState('dashboard');
@@ -130,6 +131,14 @@ function Dashboard() {
                 return (
                     <div className="page-container">
                         <Citas />
+                    </div>
+                );
+
+            case 'historial-medico':
+            case 'medical-history':
+                return (
+                    <div className="page-container">
+                        <HistorialMedico />
                     </div>
                 );
 
