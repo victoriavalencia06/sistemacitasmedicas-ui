@@ -66,7 +66,7 @@ const historialMedicoService = {
             const dataToSend = {
                 ...historialData,
                 estado: 1,
-                fechahora: new Date().toISOString()
+                fechahora: new Date().toLocaleString('sv-SE').replace(' ', 'T')
             };
 
             const response = await api.post('/historialmedico/create', dataToSend, {

@@ -58,53 +58,67 @@ const HistorialMedicoDetails = ({ historial, onClose }) => {
             </div>
 
             <div className="management-form">
+                {/* Primera fila - Información Básica */}
                 <div className="row">
-                    <div className="col-md-6">
+                    <div className="col-12">
                         <div className="detail-section">
                             <h4 className="detail-section-title">
                                 <FaUserInjured className="me-2" />
                                 Información Básica
                             </h4>
-
-                            <div className="detail-item">
-                                <label>ID del Historial:</label>
-                                <span className="detail-value">#{historial.id}</span>
-                            </div>
-
-                            <div className="detail-item">
-                                <label><FaUserInjured className="me-1" /> ID Paciente:</label>
-                                <span className="detail-value">#{historial.idPaciente}</span>
-                            </div>
-
-                            <div className="detail-item">
-                                <label><FaCalendarAlt className="me-1" /> ID Cita:</label>
-                                <span className="detail-value">#{historial.idCita}</span>
-                            </div>
-
-                            <div className="detail-item">
-                                <label>Estado:</label>
-                                <span className={`status-badge ${historial.estado ? 'status-active' : 'status-inactive'}`}>
-                                    {historial.estado ? 'Activo' : 'Inactivo'}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="col-md-6">
-                        <div className="detail-section">
-                            <h4 className="detail-section-title">
-                                <FaCalendarAlt className="me-2" />
-                                Fecha
-                            </h4>
-
-                            <div className="detail-item">
-                                <label>Fecha y Hora:</label>
-                                <span className="detail-value">{formatFecha(historial.fechahora)}</span>
+                            <div className="row">
+                                <div className="col-md-3">
+                                    <div className="detail-item">
+                                        <label>ID del Historial:</label>
+                                        <span className="detail-value">#{historial.id}</span>
+                                    </div>
+                                </div>
+                                <div className="col-md-3">
+                                    <div className="detail-item">
+                                        <label><FaUserInjured className="me-1" /> ID Paciente:</label>
+                                        <span className="detail-value">#{historial.idPaciente}</span>
+                                    </div>
+                                </div>
+                                <div className="col-md-3">
+                                    <div className="detail-item">
+                                        <label><FaCalendarAlt className="me-1" /> ID Cita:</label>
+                                        <span className="detail-value">#{historial.idCita}</span>
+                                    </div>
+                                </div>
+                                <div className="col-md-3">
+                                    <div className="detail-item">
+                                        <label>Estado:</label>
+                                        <span className={`status-badge ${historial.estado ? 'status-active' : 'status-inactive'}`}>
+                                            {historial.estado ? 'Activo' : 'Inactivo'}
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                {/* Segunda fila - Fecha */}
+                <div className="row mt-3">
+                    <div className="col-12">
+                        <div className="detail-section">
+                            <h4 className="detail-section-title">
+                                <FaCalendarAlt className="me-2" />
+                                Fecha
+                            </h4>
+                            <div className="row">
+                                <div className="col-12">
+                                    <div className="detail-item">
+                                        <label>Fecha y Hora:</label>
+                                        <span className="detail-value">{formatFecha(historial.fechahora)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Tercera fila - Información Médica Principal */}
                 <div className="row mt-3">
                     <div className="col-12">
                         <div className="detail-section">
@@ -112,47 +126,51 @@ const HistorialMedicoDetails = ({ historial, onClose }) => {
                                 <FaStethoscope className="me-2" />
                                 Información Médica Principal
                             </h4>
-
-                            <div className="detail-item-full">
-                                <label><FaStethoscope className="me-1" /> Diagnóstico:</label>
-                                <div className="detail-text-area">
-                                    {historial.diagnostico || 'No especificado'}
+                            <div className="row">
+                                <div className="col-12">
+                                    <div className="detail-item-full">
+                                        <label><FaStethoscope className="me-1" /> Diagnóstico:</label>
+                                        <div className="detail-text-area">
+                                            {historial.diagnostico || 'No especificado'}
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-
-                            <div className="detail-item-full">
-                                <label><FaPills className="me-1" /> Tratamientos:</label>
-                                <div className="detail-text-area">
-                                    {historial.tratamientos || 'No especificado'}
+                                <div className="col-12 mt-2">
+                                    <div className="detail-item-full">
+                                        <label><FaPills className="me-1" /> Tratamientos:</label>
+                                        <div className="detail-text-area">
+                                            {historial.tratamientos || 'No especificado'}
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-
-                            <div className="detail-item-full">
-                                <label><FaNotesMedical className="me-1" /> Cuadro Médico:</label>
-                                <div className="detail-text-area">
-                                    {historial.cuadroMedico || 'No especificado'}
+                                <div className="col-12 mt-2">
+                                    <div className="detail-item-full">
+                                        <label><FaNotesMedical className="me-1" /> Cuadro Médico:</label>
+                                        <div className="detail-text-area">
+                                            {historial.cuadroMedico || 'No especificado'}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                {/* Cuarta fila - Antecedentes y Observaciones en columnas */}
                 <div className="row mt-3">
                     <div className="col-md-6">
-                        <div className="detail-section">
+                        <div className="detail-section h-100">
                             <h4 className="detail-section-title">
                                 <FaAllergies className="me-2" />
                                 Antecedentes y Alergias
                             </h4>
-
                             <div className="detail-item-full">
                                 <label><FaAllergies className="me-1" /> Alergias:</label>
                                 <div className="detail-text-area">
                                     {historial.alergias || 'No especificadas'}
                                 </div>
                             </div>
-
-                            <div className="detail-item-full">
+                            <div className="detail-item-full mt-2">
                                 <label><FaProcedures className="me-1" /> Antecedentes Familiares:</label>
                                 <div className="detail-text-area">
                                     {historial.antecedentesFamiliares || 'No especificados'}
@@ -162,20 +180,18 @@ const HistorialMedicoDetails = ({ historial, onClose }) => {
                     </div>
 
                     <div className="col-md-6">
-                        <div className="detail-section">
+                        <div className="detail-section h-100">
                             <h4 className="detail-section-title">
                                 <FaNotesMedical className="me-2" />
                                 Observaciones y Notas
                             </h4>
-
                             <div className="detail-item-full">
                                 <label>Observaciones:</label>
                                 <div className="detail-text-area">
                                     {historial.observaciones || 'No especificadas'}
                                 </div>
                             </div>
-
-                            <div className="detail-item-full">
+                            <div className="detail-item-full mt-2">
                                 <label>Notas Adicionales:</label>
                                 <div className="detail-text-area">
                                     {historial.notas || 'No especificadas'}

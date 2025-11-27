@@ -11,24 +11,30 @@ import {
   FaUsersCog,
   FaStethoscope,
   FaSpinner,
-  FaNotesMedical
+  FaNotesMedical,
+  FaUserFriends,
+  FaUserCircle,
+  FaCalendarPlus,
+  FaHistory,
+  FaUserInjured
 } from "react-icons/fa";
 import { AuthContext } from "../../context/AuthContext";
 
+// ICONOS CORREGIDOS - Versión mejorada
 const menuIcons = {
   'Dashboard': FaChartBar,
   'Citas': FaCalendar,
-  'Pacientes': FaUser,
+  'Pacientes': FaUserInjured,
   'Médicos': FaUserMd,
   'Reportes': FaClipboardList,
   'Notificaciones': FaBell,
-  'Mi Perfil': FaUser,
-  'Agendar Cita': FaCalendar,
-  'Mis Citas': FaHeart,
+  'Mi Perfil': FaUserCircle,
+  'Agendar Cita': FaCalendarPlus,
+  'Mis Citas': FaHistory,
   'Inicio': FaChartBar,
   'Roles': FaUsersCog,
   'Especializaciones': FaStethoscope,
-  'Usuarios': FaUsersCog,
+  'Usuarios': FaUserFriends,
   'Configuración': FaCog,
   'Historial Médico': FaNotesMedical
 };
@@ -45,15 +51,20 @@ export default function Sidebar({
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    console.log('🔍 DEBUG - userPermissions:', userPermissions);
+    console.log('🔍 DEBUG - user rol:', user?.rol);
+
     if (userPermissions && userPermissions.length > 0) {
-      console.log('Usando permisos del contexto:', userPermissions);
-      
+      console.log('✅ Usando permisos del contexto:', userPermissions);
+
       const mappedMenus = userPermissions
         .filter(menu => menu.habilitado)
         .map(menu => {
           const IconComponent = menuIcons[menu.nombreMenu] || FaCog;
+          console.log(`🔍 Mapeando: "${menu.nombreMenu}" -> Icono:`, IconComponent);
+
           const id = menu.nombreMenu.toLowerCase().replace(/\s+/g, '-');
-          
+
           return {
             id: id,
             label: menu.nombreMenu,
@@ -63,57 +74,65 @@ export default function Sidebar({
         })
         .sort((a, b) => a.label.localeCompare(b.label));
 
-      console.log('Menús mapeados desde contexto:', mappedMenus);
+      console.log('✅ Menús mapeados desde contexto:', mappedMenus);
       setMenuItems(mappedMenus);
     } else {
-      console.log('No hay permisos en el contexto, usando menú por defecto');
-      setMenuItems(getDefaultMenu(user?.rol));
+      console.log('⚠️ No hay permisos en el contexto, usando menú por defecto');
+      const defaultMenu = getDefaultMenu(user?.rol);
+      console.log('✅ Menú por defecto:', defaultMenu);
+      setMenuItems(defaultMenu);
     }
   }, [userPermissions, user?.rol]);
 
-const getDefaultMenu = (userRole) => {
+  const getDefaultMenu = (userRole) => {
+    console.log('🔍 getDefaultMenu llamado con rol:', userRole);
+
     const roleMenus = {
-        "1": [ // Administrador
-            { id: "dashboard", label: "Dashboard", icon: FaChartBar },
-            { id: "citas", label: "Citas", icon: FaCalendar },
-            { id: "pacientes", label: "Pacientes", icon: FaUser },
-            { id: "medicos", label: "Médicos", icon: FaUserMd },
-            { id: "historial-medico", label: "Historial Médico", icon: FaNotesMedical }, // ← NUEVO
-            { id: "reportes", label: "Reportes", icon: FaClipboardList },
-            { id: "notificaciones", label: "Notificaciones", icon: FaBell },
-            { id: "roles", label: "Roles", icon: FaUsersCog },
-            { id: "especializaciones", label: "Especializaciones", icon: FaStethoscope },
-            { id: "usuarios", label: "Usuarios", icon: FaUsersCog }
-        ],
-        "2": [ // Doctor
-            { id: "dashboard", label: "Dashboard", icon: FaChartBar },
-            { id: "citas", label: "Citas", icon: FaCalendar },
-            { id: "pacientes", label: "Mis Pacientes", icon: FaUser },
-            { id: "historial-medico", label: "Historial Médico", icon: FaNotesMedical }, // ← NUEVO
-            { id: "notificaciones", label: "Notificaciones", icon: FaBell }
-        ],
-        "3": [ // Paciente
-            { id: "perfil", label: "Mi Perfil", icon: FaUser },
-            { id: "agendar-cita", label: "Agendar Cita", icon: FaCalendar },
-            { id: "mis-citas", label: "Mis Citas", icon: FaHeart },
-            { id: "historial-medico", label: "Mi Historial", icon: FaNotesMedical }, // ← NUEVO (nombre diferente para paciente)
-            { id: "notificaciones", label: "Notificaciones", icon: FaBell }
-        ],
-        "6": [ // Secretaria
-            { id: "dashboard", label: "Dashboard", icon: FaChartBar },
-            { id: "citas", label: "Citas", icon: FaCalendar },
-            { id: "pacientes", label: "Pacientes", icon: FaUser },
-            { id: "historial-medico", label: "Historial Médico", icon: FaNotesMedical }, // ← NUEVO
-            { id: "notificaciones", label: "Notificaciones", icon: FaBell }
-        ]
+      "1": [ // Administrador
+        { id: "dashboard", label: "Dashboard", icon: FaChartBar },
+        { id: "usuarios", label: "Usuarios", icon: FaUserFriends },
+        { id: "roles", label: "Roles", icon: FaUsersCog },
+        { id: "pacientes", label: "Pacientes", icon: FaUserInjured },
+        { id: "medicos", label: "Médicos", icon: FaUserMd },
+        { id: "citas", label: "Citas", icon: FaCalendar },
+        { id: "especializaciones", label: "Especializaciones", icon: FaStethoscope },
+        { id: "historial-medico", label: "Historial Médico", icon: FaNotesMedical },
+        { id: "reportes", label: "Reportes", icon: FaClipboardList },
+        { id: "notificaciones", label: "Notificaciones", icon: FaBell }
+      ],
+      "2": [ // Doctor
+        { id: "dashboard", label: "Dashboard", icon: FaChartBar },
+        { id: "citas", label: "Citas", icon: FaCalendar },
+        { id: "pacientes", label: "Mis Pacientes", icon: FaUserInjured },
+        { id: "historial-medico", label: "Historial Médico", icon: FaNotesMedical },
+        { id: "notificaciones", label: "Notificaciones", icon: FaBell }
+      ],
+      "3": [ // Paciente
+        { id: "dashboard", label: "Dashboard", icon: FaChartBar },
+        { id: "agendar-cita", label: "Agendar Cita", icon: FaCalendarPlus },
+        { id: "mis-citas", label: "Mis Citas", icon: FaHistory },
+        { id: "historial-medico", label: "Mi Historial", icon: FaNotesMedical },
+        { id: "notificaciones", label: "Notificaciones", icon: FaBell },
+        { id: "perfil", label: "Mi Perfil", icon: FaUserCircle }
+      ],
+      "6": [ // Secretaria
+        { id: "dashboard", label: "Dashboard", icon: FaChartBar },
+        { id: "citas", label: "Citas", icon: FaCalendar },
+        { id: "pacientes", label: "Pacientes", icon: FaUserInjured },
+        { id: "medicos", label: "Médicos", icon: FaUserMd },
+        { id: "historial-medico", label: "Historial Médico", icon: FaNotesMedical },
+        { id: "notificaciones", label: "Notificaciones", icon: FaBell }
+      ]
     };
 
-    return roleMenus[userRole] || [{ id: "dashboard", label: "Dashboard", icon: FaChartBar }];
-};
+    const menu = roleMenus[userRole] || [{ id: "dashboard", label: "Dashboard", icon: FaChartBar }];
+    console.log('🔍 Menú seleccionado:', menu);
+    return menu;
+  };
 
   const roleNames = {
     "1": "Administrador",
-    "2": "Doctor", 
+    "2": "Doctor",
     "3": "Paciente",
     "6": "Secretaria"
   };
@@ -128,6 +147,9 @@ const getDefaultMenu = (userRole) => {
       onCloseMobile();
     }
   };
+
+  // DEBUG: Mostrar qué iconos se están renderizando
+  console.log('🎯 MenuItems actual:', menuItems);
 
   if (loading) {
     return (
@@ -155,6 +177,8 @@ const getDefaultMenu = (userRole) => {
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = currentScreen === item.id;
+            console.log(`🎯 Renderizando: ${item.label} con icono:`, Icon);
+
             return (
               <button
                 key={item.id}

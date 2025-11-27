@@ -117,7 +117,7 @@ const citaService = {
         }
     },
 
-    /* ---------- MÉTODOS PARA CALENDARIO (mantengo tus helpers) ---------- */
+    /* ---------- MÉTODOS PARA CALENDARIO ---------- */
     getByMonth: async (year, month, forceRefresh = false) => {
         try {
             const key = `${String(year).padStart(4, '0')}-${String(month).padStart(2, '0')}`;
@@ -176,6 +176,39 @@ const citaService = {
         } catch (error) {
             console.error('❌ Error en GET BY DAY:', error);
             throw error.response?.data || new Error('Error al obtener citas por día');
+        }
+    },
+
+    // Obtener cupos disponibles
+    getAvailableSlots: async (date = new Date(), slotsPerDay = 20) => {
+        try {
+            const key = formatDateKey(date);
+            if (!key) throw new Error('Fecha inválida para cupos disponibles');
+
+            console.log(`🔍 solicitando cupos disponibles para ${key} (slotsPerDay=${slotsPerDay})`);
+
+            const response = await api.get(`/cita/cupos-disponibles?date=${key}&slotsPerDay=${slotsPerDay}`);
+            const data = response.data;
+
+            // Normalizar posibles formas de respuesta
+            // Esperado: { Fecha, TotalCupos, CitasConfirmadas, CuposDisponibles } o camelCase o nombres alternativos
+            const fecha = data?.Fecha ?? data?.fecha ?? data?.date ?? key;
+            const total = Number(data?.TotalCupos ?? data?.totalCupos ?? data?.total ?? slotsPerDay);
+            const confirmed = Number(data?.CitasConfirmadas ?? data?.citasConfirmadas ?? data?.confirmed ?? 0);
+            const available = Number(data?.CuposDisponibles ?? data?.cuposDisponibles ?? data?.availableSlots ?? data?.available ?? Math.max(0, total - confirmed));
+
+            const result = {
+                date: fecha,
+                totalCupos: total,
+                citasConfirmadas: confirmed,
+                cuposDisponibles: available
+            };
+
+            console.log('✅ cupos disponibles result:', result);
+            return result;
+        } catch (err) {
+            console.error('❌ Error en getAvailableSlots:', err);
+            throw err.response?.data || err;
         }
     },
 
@@ -290,7 +323,6 @@ const citaService = {
     },
 
     /* ---------- MÉTODOS AUXILIARES ---------- */
-    // exporto la utilidad para que otros componentes la usen si necesitan formatear
     isoToDatetimeLocalInput,
     clearCaches: () => {
         citaService._monthCache = {};
