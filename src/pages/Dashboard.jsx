@@ -9,6 +9,8 @@ import WelcomeCard from '../components/dashboard/WelcomeCard';
 import CalendarSection from '../components/dashboard/CalendarSection';
 import statsService from '../services/statsService'; // <-- import statsService
 import StatsCards from '../components/dashboard/StatsCards';
+import ChartCitas from '../components/dashboard/ChartCitas';
+import ChartEspecializacion from '../components/dashboard/ChartEspecializacion';
 
 // Páginas del sistema - TODAS DESCOMENTADAS
 import Roles from '../pages/Roles';
@@ -115,6 +117,16 @@ function Dashboard() {
                             <div className="col-12">
                                 {/* Pasamos stats y onRetry para que StatsCards muestre datos del padre */}
                                 <StatsCards stats={stats} onRetry={handleStatsRetry} />
+                            </div>
+                        </div>
+
+                        <div className="charts-grid">
+                            <div className="chart-column">
+                                <ChartCitas />
+                            </div>
+
+                            <div className="chart-column">
+                                <ChartEspecializacion />
                             </div>
                         </div>
 

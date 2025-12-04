@@ -615,6 +615,20 @@ body {
     padding: 0;
 }
 
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.chart-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
 /* Responsive para componentes del dashboard */
 @media (max-width: 1200px) {
     .welcome-card .card-body {

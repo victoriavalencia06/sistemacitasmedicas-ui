@@ -40,6 +40,29 @@ const especializacionService = {
         }
     },
 
+
+    // Obtener doctores por especialización (nuevo)
+    getDoctoresPorEspecializacion: async () => {
+        try {
+            const response = await api.get('/especializacion/doctores-por-especializacion');
+            return response.data;
+        } catch (error) {
+            console.error('Error al obtener doctores por especialización:', error);
+            throw error.response?.data || new Error('Error al obtener estadísticas por especialización');
+        }
+    },
+
+    // Obtener la especialización con más doctores (nuevo)
+    getEspecializacionConMasDoctores: async () => {
+        try {
+            const response = await api.get('/especializacion/especializacion-mas-doctores');
+            return response.data;
+        } catch (error) {
+            console.error('Error al obtener especialización con más doctores:', error);
+            throw error.response?.data || new Error('Error al obtener la especialización con más doctores');
+        }
+    },
+
     // Crear nueva especialización - datos: { Nombre: string, Descripcion: string, Estado: number }
     create: async (especializacionData) => {
         try {
