@@ -11,6 +11,8 @@ import statsService from '../services/statsService'; // <-- import statsService
 import StatsCards from '../components/dashboard/StatsCards';
 import ChartCitas from '../components/dashboard/ChartCitas';
 import ChartEspecializacion from '../components/dashboard/ChartEspecializacion';
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 // Páginas del sistema - TODAS DESCOMENTADAS
 import Roles from '../pages/Roles';
@@ -20,6 +22,7 @@ import Citas from '../pages/Citas';
 import Usuarios from '../pages/Usuarios';
 import Doctor from '../pages/Doctor';
 import HistorialMedico from '../pages/HistorialMedico';
+
 
 function Dashboard() {
     const [currentScreen, setCurrentScreen] = React.useState('dashboard');
@@ -72,6 +75,20 @@ function Dashboard() {
         }
     };
 
+        const handleDownloadPDF = async () => {
+        const element = document.querySelector(".dashboard-content");
+        if (!element) return;
+
+        const canvas = await html2canvas(element, { scale: 2 });
+        const imgData = canvas.toDataURL("image/png");
+
+        const pdf = new jsPDF("p", "mm", "a4");
+        const imgWidth = 210; 
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+        pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+        pdf.save("dashboard.pdf");
+    };
     const handleLogout = () => {
         logout();
     };
@@ -135,6 +152,12 @@ function Dashboard() {
                                 <CalendarSection />
                             </div>
                         </div>
+                        <div className="d-flex justify-content-end mb-3">
+                            <button className="btn btn-success" onClick={handleDownloadPDF}>
+                                Descargar PDF
+                            </button>
+                        </div>
+
                     </div>
                 );
 
