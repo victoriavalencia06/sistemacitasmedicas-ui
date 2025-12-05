@@ -11,7 +11,7 @@ import {
   FaUsersCog,
   FaStethoscope,
   FaSpinner,
-  FaNotesMedical,
+  FaFileMedical,
   FaUserFriends,
   FaUserCircle,
   FaCalendarPlus,
@@ -25,7 +25,7 @@ const menuIcons = {
   'Dashboard': FaChartBar,
   'Citas': FaCalendar,
   'Pacientes': FaUserInjured,
-  'Médicos': FaUserMd,
+  'Doctor': FaUserMd,
   'Reportes': FaClipboardList,
   'Notificaciones': FaBell,
   'Mi Perfil': FaUserCircle,
@@ -36,7 +36,7 @@ const menuIcons = {
   'Especializaciones': FaStethoscope,
   'Usuarios': FaUserFriends,
   'Configuración': FaCog,
-  'Historial Médico': FaNotesMedical
+  'Historial Medico': FaFileMedical
 };
 
 export default function Sidebar({
@@ -96,7 +96,7 @@ export default function Sidebar({
         { id: "medicos", label: "Médicos", icon: FaUserMd },
         { id: "citas", label: "Citas", icon: FaCalendar },
         { id: "especializaciones", label: "Especializaciones", icon: FaStethoscope },
-        { id: "historial-medico", label: "Historial Médico", icon: FaNotesMedical },
+        { id: "historial-medico", label: "Historial Médico", icon: FaFileMedical },
         { id: "reportes", label: "Reportes", icon: FaClipboardList },
         { id: "notificaciones", label: "Notificaciones", icon: FaBell }
       ],
@@ -104,14 +104,14 @@ export default function Sidebar({
         { id: "dashboard", label: "Dashboard", icon: FaChartBar },
         { id: "citas", label: "Citas", icon: FaCalendar },
         { id: "pacientes", label: "Mis Pacientes", icon: FaUserInjured },
-        { id: "historial-medico", label: "Historial Médico", icon: FaNotesMedical },
+        { id: "historial-medico", label: "Historial Médico", icon: FaFileMedical },
         { id: "notificaciones", label: "Notificaciones", icon: FaBell }
       ],
       "3": [ // Paciente
         { id: "dashboard", label: "Dashboard", icon: FaChartBar },
         { id: "agendar-cita", label: "Agendar Cita", icon: FaCalendarPlus },
         { id: "mis-citas", label: "Mis Citas", icon: FaHistory },
-        { id: "historial-medico", label: "Mi Historial", icon: FaNotesMedical },
+        { id: "historial-medico", label: "Mi Historial", icon: FaFileMedical },
         { id: "notificaciones", label: "Notificaciones", icon: FaBell },
         { id: "perfil", label: "Mi Perfil", icon: FaUserCircle }
       ],
@@ -120,7 +120,7 @@ export default function Sidebar({
         { id: "citas", label: "Citas", icon: FaCalendar },
         { id: "pacientes", label: "Pacientes", icon: FaUserInjured },
         { id: "medicos", label: "Médicos", icon: FaUserMd },
-        { id: "historial-medico", label: "Historial Médico", icon: FaNotesMedical },
+        { id: "historial-medico", label: "Historial Médico", icon: FaFileMedical },
         { id: "notificaciones", label: "Notificaciones", icon: FaBell }
       ]
     };

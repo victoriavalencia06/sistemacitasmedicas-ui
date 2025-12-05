@@ -75,8 +75,8 @@ const HistorialMedicoDetails = ({ historial, onClose }) => {
                                 </div>
                                 <div className="col-md-3">
                                     <div className="detail-item">
-                                        <label><FaUserInjured className="me-1" /> ID Paciente:</label>
-                                        <span className="detail-value">#{historial.idPaciente}</span>
+                                        <label><FaUserInjured className="me-1" />Paciente:</label>
+                                        <span className="detail-value">#{historial.nombrePaciente}</span>
                                     </div>
                                 </div>
                                 <div className="col-md-3">
